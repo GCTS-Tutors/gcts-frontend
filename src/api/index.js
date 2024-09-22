@@ -21,7 +21,7 @@ export const logoutUser = async () => {
     // Get the jwt token and send it to the logout endpoint
     const refresh_token = localStorage.getItem('refreshToken');
     if (refresh_token) {
-        const response = await axios.post('/auth/logout/', {
+        const response = await api.post('/auth/logout/', {
             'refresh_token': refresh_token
         });
         localStorage.removeItem('token');
@@ -89,6 +89,13 @@ export const createOrderReview = async (data) => {
 export const getReviews = async () => {
     try {
         const response = await api.get('/reviews/?status=approved');
+        if (response.data.length == 0) {
+            return [{
+                id: 1,
+                review: "GCTS is simply the best. Helped me navigate my studies at a particularly difficult time.",
+                created_at: "2024-08-01",
+            }];
+        }
         return response.data;
     } catch (error) {
         return [{
@@ -119,5 +126,23 @@ export const createInquiry = async (data) => {
 
 export const getInquiries = async () => {
     const response = await api.get('/inquiries/');
+    return response.data;
+}
+
+// Papers
+export const getPapers = async () => {
+    const response = await api.get('/papers/');
+    return response.data;
+}
+
+export const getPaper = async (id) => {
+    const response = await api.get(`/papers/${id}`);
+    return response.data;
+}
+
+
+// UserPapers
+export const getUserPapers = async () => {
+    const response = await api.get('/users/get_user_papers/');
     return response.data;
 }

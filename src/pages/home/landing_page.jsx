@@ -1,3 +1,4 @@
+import React, {useState, useEffect} from "react";
 import {Testimonials} from "../../components/testimonials";
 import {SiteData} from "../../assets/data/site";
 import {Image} from "react-bootstrap";
@@ -9,6 +10,7 @@ import {BlogPost} from "../blog/blog";
 import {OrderForm} from "../orders/order_form";
 import {SampleReviews} from "../../assets/data/reviews";
 import {Slides} from "../../assets/data/landing_slides";
+import { getPapers } from "../../api";
 
 export const LandingPage = (props) => {
     return (
@@ -78,6 +80,16 @@ const PageData = () => {
 }
 
 const SamplePapers = () => {
+    const [papers, setPapers] = useState([]);
+    
+    useEffect(() => {
+        const retrievePapers = async () => {
+            const response = await getPapers();
+            setPapers(response);
+        }
+        retrievePapers();
+    }, []);
+
     return (
         <div className="d-flex flex-column justify-content-evenly align-items-center w-100 p-3">
             <div className="">
@@ -87,13 +99,19 @@ const SamplePapers = () => {
 
             <div
                 className="overflow-x-scroll sample-papers-section p-3 d-flex flex-row justify-content-around align-items-center">
-                {
-                    SamplePosts.map((post) => (
+                {papers ? (
+                    papers.map((post) => (
                         <div className="sample-post w-auto m-2 h-100">
                             <BlogPost data={post}/>
                         </div>
                     ))
-                }
+                ):(
+                    <div className="w-100 h-100 d-flex flex-column justify-content-evenly align-items-center">
+                        <div className="w-100">
+                            <p className="lead">No posts found.</p>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     )

@@ -31,7 +31,14 @@ function App() {
                         }
                     />
 
-                    <Route path='/view-post/:title' element={<ViewPost/>}/>
+                    <Route 
+                        path='/view-post/:id' 
+                        element={
+                            <PrivateRoute>
+                                <ViewPost/>
+                            </PrivateRoute>
+                        }
+                    />
                     <Route path='/login' element={<LoginPage />}/>
                     <Route path='/register' element={<RegisterPage />}/>
                     <Route path='*' element={<LandingPage/>}/>

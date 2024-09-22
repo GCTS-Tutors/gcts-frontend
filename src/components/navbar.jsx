@@ -26,15 +26,15 @@ export const CustomNavbar = () => {
                     <Nav className="w-100">
                         <div className="d-flex flex-row flex-sm-column justify-content-evenly w-100">
                             <div className="mx-2 d-flex flex-row justify-content-center align-items-center text-black">
-                                <div className="mx-1 w-60 d-flex flex-row justify-content-start align-items-center">
-                                    <Nav.Link className=" p-2 mx-2">
+                                <div className="mx-1 w-60 d-flex flex-column flex-md-row justify-content-start align-items-center">
+                                    <Nav.Link className="p-2 mx-2">
                                         <Link to="/"
                                               className="w-100 d-flex flex-row justify-content-center align-items-center">
                                             <span className="me-2"><House size={24} color="black"/></span>
                                             <span>Home</span>
                                         </Link>
                                     </Nav.Link>
-                                    <Nav.Link className=" p-2 mx-2">
+                                    <Nav.Link className="p-2 mx-2">
                                         <Link to="/papers"
                                               className="w-100 d-flex flex-row justify-content-center align-items-center">
                                             <span className="me-2"><Scroll size={24} color="black"/></span>
@@ -42,7 +42,7 @@ export const CustomNavbar = () => {
                                         </Link>
                                     </Nav.Link>
 
-                                    <Nav.Link className=" p-2 mx-2">
+                                    <Nav.Link className="p-2 mx-2">
                                         <Link to="/faqs"
                                               className="w-100 d-flex flex-row justify-content-center align-items-center">
                                             <span className="me-2"><Info size={24} color="black"/></span>
@@ -50,10 +50,10 @@ export const CustomNavbar = () => {
                                         </Link>
                                     </Nav.Link>
                                 </div>
-                                <div className="mx-1 w-40 d-flex flex-row justify-content-end align-items-center">
+                                <div className="mx-1 w-40 d-flex flex-column flex-md-row justify-content-end align-items-center">
                                     {user ? (
                                         <>
-                                            <Nav.Link className=" p-2 mx-2">
+                                            <Nav.Link className="p-2 mx-2">
                                                 <Link to="/dashboard"
                                                       className="w-100 d-flex flex-row justify-content-center align-items-center">
                                                     <span className="me-2"><User size={24} color="black"/></span>

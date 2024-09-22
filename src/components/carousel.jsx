@@ -14,7 +14,7 @@ export const CustomCarousel = (props) => {
                             <Carousel.Caption className="p-5 box-shadow-6 bg-off-white centered w-70 h-70 d-flex flex-column justify-content-evenly align-items-center">
                                 <h1 className="text-black">{slide.title}</h1>
                                 <p className="fs-6">{slide.description}</p>
-                                <Link className="btn site-btn w-40" to={slide.button.link} title={slide.button.id}>{slide.button.id}</Link>
+                                <Link className="btn site-btn w-fit-content" to={slide.button.link} title={slide.button.id}>{slide.button.id}</Link>
                             </Carousel.Caption>
                         </Carousel.Item>
                     ))

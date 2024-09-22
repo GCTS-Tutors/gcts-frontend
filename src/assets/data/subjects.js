@@ -25,7 +25,7 @@ export const Subjects = [
     },
     {
         id: 3,
-        title: "Engineering",
+        title: "Computer Science",
         icon: engineering_img,
     },
     {

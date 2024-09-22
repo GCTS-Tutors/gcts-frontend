@@ -10,52 +10,52 @@ export const Slides = [
     {
         title: "Home",
         cover_img: cover_img_1,
-        description: "Welcome to Grand Canyon Tutoring Site, your one-stop destination for all your tutoring and assignment help needs. Explore our services and start your academic journey with us.",
+        description: "Welcome to Grand Canyon Tutoring Site, your one-stop destination for all your tutoring and assignment help needs.",
         button: {
             id: "Get Started",
-            link: "#get-started",
+            link: "/#get-started",
         }
     },
     {
         title: "About Us",
         cover_img: cover_img_2,
-        description: "Learn more about our mission, vision, and values. Discover how we aim to provide exceptional tutoring services specifically tailored for Grand Canyon University students.",
+        description: "We provide exceptional tutoring services specifically tailored for Grand Canyon University students.",
         button: {
-            id: "About Us",
-            link: "/about-us",
+            id: "Place Order",
+            link: "/#place-order",
         }
     },
     {
         title: "Services",
         cover_img: cover_img_3,
-        description: "Browse through our wide range of services, including assignment help, tutoring sessions, and project assistance. Find the right support for your academic needs.",
+        description: "We provide a wide range of services, including assignment help, tutoring sessions, and project assistance.",
         button: {
-            id: "Services",
-            link: "/services",
+            id: "Place Order",
+            link: "/#place-order",
         }
     },
     {
         title: "Papers",
         cover_img: cover_img_4,
-        description: "Stay updated with the latest sample academic papers, tips, and resources related to nursing and healthcare programs. Our blog is designed to keep you informed and engaged.",
+        description: "Stay updated with the latest sample academic papers, tips, and resources related to your study program.",
         button: {
-            id: "Browse Papers",
+            id: "Browse",
             link: "/papers",
         }
     },
     {
         title: "Testimonials",
         cover_img: cover_img_5,
-        description: "Read what our satisfied students have to say about their experiences with our tutoring services. Discover how we have helped them achieve academic success.",
+        description: "Read what our satisfied students have to say about their experiences with our tutoring services.",
         button: {
             id: "View",
-            link: "#testimonials",
+            link: "/#testimonials",
         }
     },
     {
         title: "FAQs",
         cover_img: cover_img_6,
-        description: "Find answers to frequently asked questions about our services, processes, and policies. Get the information you need to make the most of our platform.",
+        description: "Find answers to frequently asked questions about our services, processes, and policies.",
         button: {
             id: "Browse FAQs",
             link: "/faqs",
@@ -64,7 +64,7 @@ export const Slides = [
     {
         title: "Contact Us",
         cover_img: cover_img_7,
-        description: "Get in touch with us for any inquiries, support, or feedback. We are here to assist you and ensure you have the best experience with our tutoring services.",
+        description: "Get in touch with us for any inquiries, support, or feedback. We are here to assist you.",
         button: {
             id: "Contact Us",
             link: "/#sample-papers",

@@ -13,9 +13,15 @@ export const Testimonials = (props) => {
 
     useEffect(() => {
         // Fetch reviews
-        getReviews().then((data) => {
-            setReviews(data);
-        });
+        const retrieveReviews = async () => {
+            try {
+                const response = await getReviews();
+                setReviews(response);
+            } catch (error) {
+                return [];
+            }
+        }
+        retrieveReviews();
     }, []);
 
 
@@ -27,22 +33,14 @@ export const Testimonials = (props) => {
             </div>
             <div className="w-90 mx-auto box-shadow-6 rounded-2">
                 <Carousel className="">
-                    {reviews && Array.isArray(reviews) && reviews.length > 0 ? (
+                    {reviews && (
                         reviews.map((review) => (
                             <Carousel.Item key={review.id}>
                                 <Image className="w-100 h-100 object-fit-cover rounded-2" src={testimonial_bg} />
                                 <Carousel.Caption className="w-70 h-70 centered rounded-2">
                                     <Testimonial data={review} />
                                 </Carousel.Caption>
-                            </Carousel.Item>
-                        ))
-                    ) : (
-                        <Carousel.Item>
-                            <Image className="w-100 h-100 object-fit-cover rounded-2" src={testimonial_bg} />
-                            <Carousel.Caption className="w-70 h-70 centered rounded-2">
-                                <p className="p-3 bg-light rounded">Retrieving reviews...</p>
-                            </Carousel.Caption>
-                        </Carousel.Item>
+                            </Carousel.Item>))
                     )}
 
                 </Carousel>
@@ -59,7 +57,7 @@ export const Testimonial = (props) => {
                 <div className="img w-20 p-2">
                     <ThumbsUp size={36} color={SiteData.site_colours.accent_colour} />
                 </div>
-                <p className="w-80 p-2 text-wrap">{review}</p>
+                <p className="w-80 p-2 text-wrap text-truncate">{review}</p>
             </div>
             <div className="p-2 bg-off-white w-70 mx-auto h-100 rounded-2 box-shadow-1 d-flex flex-column justify-content-center align-items-center">
                 <TestimonialId profile={user} created_at={created_at} />
@@ -83,7 +81,7 @@ const TestimonialId = (props) => {
             </div>
             <div className="w-80 ms-2 text-start small d-flex flex-column justify-content-start align-items-start">
                 <span className="fw-semibold small text-purple">{props.profile?.username || "Anonymous"}</span>
-                <span className="smaller">{FormatDateTime(props.created_at)}</span>
+                {/* <span className="smaller">{FormatDateTime(props.created_at)}</span> */}
             </div>
         </div>
     )

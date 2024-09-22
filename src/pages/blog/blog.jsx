@@ -4,23 +4,24 @@ import defaultBlogPostCover from "../../assets/images/apple-and-books.jpeg";
 import {Link} from "react-router-dom";
 
 export const BlogPost = (props) => {
-    const { cover_img, title, description } = props.data;
+    const { cover_img, title, id, content } = props.data;
 
     return (
         <div className="card w-100 h-100 border-0 box-shadow-7 m-2">
-            <Link to={'/view-post/' + title} className="w-100 h-100">
+            <Link to={'/view-post/' + id} className="w-100 h-100">
                 <div className="card-img h-100 w-100">
-                    <Image src={cover_img} className="w-100 h-100 object-fit-cover" fluid/>
+                    <Image src={cover_img ? cover_img : defaultBlogPostCover} className="w-100 h-100 object-fit-cover" fluid/>
                 </div>
                 <div className="card-img-overlay w-100 h-100 p-0">
-                    <PostOverlay description={description} title={title}/>
+                    <PostOverlay description={content} title={title}/>
                 </div>
             </Link>
         </div>
     )
 }
+
 BlogPost.defaultProps = {
-    cover_image: defaultBlogPostCover,
+    cover_img: defaultBlogPostCover,
 }
 
 export const PostOverlay = (props) => {
@@ -51,7 +52,7 @@ PostTitle.defaultProps = {
 export const PostDescription = (props) => {
     return (
         <div className="p-2 h-100 d-flex flex-column justify-content-end">
-            <span className="text-start">{props.description}</span>
+            <span className="text-start">{props.description && getPostSummary(props.description, 20)}</span>
         </div>
     )
 }
@@ -61,4 +62,11 @@ PostDescription.defaultProps = {
 
 export function CountPostWords(text) {
     return text.trim().split(/\s+/).length;
+}
+
+export function getPostSummary(text, wordCount) {
+    const words = text.split(" ");
+
+    return words.slice(0, wordCount).join(" ") + "...";
+    
 }

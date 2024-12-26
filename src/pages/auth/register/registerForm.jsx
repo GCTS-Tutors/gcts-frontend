@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Button, Form, Spinner} from "react-bootstrap";
+import {Button, Form, InputGroup, Spinner} from "react-bootstrap";
 import {Link, useNavigate} from "react-router-dom";
 import {CustomModal} from "../../../components/modal";
 import {CheckCircle, XCircle} from "phosphor-react";
@@ -7,6 +7,9 @@ import {HorizontalRule} from "../../../components/elements";
 import {generateOTP, registerUser, verifyOTP} from "../../../api";
 import {useAuth} from "../../../context/AuthContext";
 import OTPForm from "../../../components/OTPForm";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import PasswordField from "../../../components/PasswordField";
+
 
 export const RegisterForm = () => {
     const {login} = useAuth();
@@ -221,43 +224,11 @@ export const RegisterForm = () => {
                                 <div key={index}><small className="small text-danger">{error}</small></div>
                             ))}
                         </Form.Control.Feedback>
-                    </Form.Group>
+                    </Form.Group>                 
 
-                    <Form.Group className="my-3 text-start">
-                        <Form.Label className="text-purple">Password</Form.Label>
-                        <Form.Control
-                            type="password"
-                            placeholder="Enter password"
-                            name="password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            isInvalid={errors.password && errors.password.length > 0}
-                            isValid={formData.password.length > 0 && (!errors.password || errors.password.length === 0)}
-                        />
-                        <Form.Control.Feedback type="invalid">
-                            {errors.password && errors.password.map((error, index) => (
-                                <div key={index}><small className="small text-danger">{error}</small></div>
-                            ))}
-                        </Form.Control.Feedback>
-                    </Form.Group>
+                    <PasswordField label={"Password"} name={"password"} placeholder={"Enter password"} value={formData.password} onChange={handleChange} errors={errors.password} />
 
-                    <Form.Group className="my-3 text-start">
-                        <Form.Label className="text-purple">Confirm Password</Form.Label>
-                        <Form.Control
-                            type="password"
-                            placeholder="Confirm password"
-                            name="confirmPassword"
-                            value={formData.confirmPassword}
-                            onChange={handleChange}
-                            isInvalid={errors.confirmPassword && errors.confirmPassword.length > 0}
-                            isValid={formData.confirmPassword.length > 0 && (!errors.confirmPassword || errors.confirmPassword.length === 0)}
-                        />
-                        <Form.Control.Feedback type="invalid">
-                            {errors.confirmPassword && errors.confirmPassword.map((error, index) => (
-                                <div key={index}><small className="small text-danger">{error}</small></div>
-                            ))}
-                        </Form.Control.Feedback>
-                    </Form.Group>
+                    <PasswordField label={"Confirm Password"} name={"confirmPassword"} placeholder={"Confirm password"} value={formData.confirmPassword} onChange={handleChange} errors={errors.confirmPassword} />
 
                     <Button variant="primary" type="submit" className="w-100 mt-4 mb-3 btn site-btn" disabled={loading}>
                         {loading ? "Registering..." : "Register"}

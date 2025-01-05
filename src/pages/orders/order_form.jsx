@@ -5,24 +5,29 @@ import { Link, useNavigate } from "react-router-dom";
 import { createOrder } from "../../api";
 import { CustomModal, ModalContent } from "../../components/modal";
 import { useAuth } from "../../context/AuthContext";
-import { Row, Col } from "react-bootstrap"; // Import Row and Col from react-bootstrap
+import { Row, Col } from "react-bootstrap";
+import { subjects, languages, orderTypes, academicLevels, urgencyLevels, citationStyles } from "../../assets/data/orders";
+import MultipleFileUpload from "../../components/MultipleFileUpload";
 
 export const OrderForm = (props) => {
     const { user } = useAuth();
     const initialFormState = {
-        topic: "",
+        title: "",
+        subject: "nursing",
         type: "essay",
-        level: "undergraduate",
+        level: "bachelors",
         language: "english US",
         min_pages: 1,
         max_pages: 1,
         instructions: "",
         deadline: "",
         sources: 0,
-        style: "apa",
+        style: "other",
         urgency: "low",
         files_link: "",
+        files: "",
     }
+    const [files, setFiles] = useState([]);
     const [formData, setFormData] = useState(initialFormState);
 
     const [loading, setLoading] = useState(false);
@@ -42,14 +47,25 @@ export const OrderForm = (props) => {
         setSuccess(false);
         setError(null);
 
+        // Prepare FormData
+        const formDataToSend = new FormData();
+        Object.keys(formData).forEach((key) => {
+            if (key !== "files") {
+                formDataToSend.append(key, formData[key]);
+            }
+        });
+        files.forEach((file) => {
+            formDataToSend.append("uploaded_files", file); // Use "files" as the key
+        });
+
         // Submit the order to the API and get the id to use to submit the files
         try {
-            await createOrder(formData);
+            await createOrder(formDataToSend);
             setError(null);
             setSuccess(true);
             setTimeout(() => {
                 navigate("/dashboard");
-            }, 3000);            
+            }, 3000);
         } catch (error) {
             setError("There was an error submitting your order. Please try again.");
         } finally {
@@ -78,8 +94,8 @@ export const OrderForm = (props) => {
                                 as="input"
                                 placeholder="e.g. Managing Infectious Diseases"
                                 type="text"
-                                name="topic"
-                                value={formData.topic}
+                                name="title"
+                                value={formData.title}
                                 onChange={handleChange}
                                 maxLength={100}
                                 required
@@ -126,7 +142,6 @@ export const OrderForm = (props) => {
                             </Form.Group>
                         </div>
 
-
                         <Form.Group className="p-1 my-2 d-flex flex-column justify-content-evenly align-items-start">
                             <Form.Text className="mb-2 ms-1">Number of Sources Required</Form.Text>
                             <Form.Control
@@ -149,7 +164,7 @@ export const OrderForm = (props) => {
                                 placeholder="https://file.io/hhajgdedh"
                                 type="text"
                                 name="files_link"
-                                value={formData.files_link}                                
+                                value={formData.files_link}
                                 onChange={handleChange}
                                 maxLength={255}
                             />
@@ -163,6 +178,21 @@ export const OrderForm = (props) => {
                     {/* Right Column */}
                     <Col md={6} className="form-column">
 
+                        <Form.Group className="p-1 my-2 d-flex flex-column justify-content-evenly align-items-start">
+                            <Form.Text className="mb-2 ms-1">
+                                Subject <span className="text-danger">*</span>
+                            </Form.Text>
+                            <Form.Select
+                                name="subject"
+                                value={formData.subject}
+                                onChange={handleChange}
+                                required
+                            >
+                                {Object.entries(subjects).map(([key, label]) => (
+                                    <option key={key} value={key}>{label}</option>
+                                ))}
+                            </Form.Select>
+                        </Form.Group>
 
                         <Form.Group className="p-1 my-2 d-flex flex-column justify-content-evenly align-items-start">
                             <Form.Text className="mb-2 ms-1">
@@ -174,19 +204,19 @@ export const OrderForm = (props) => {
                                 onChange={handleChange}
                                 required
                             >
-                                <option value="essay" defaultValue>Essay</option>
-                                <option value="research paper">Research Paper</option>
-                                <option value="capstone project">Capstone Project</option>
-                                <option value="class discussion">Class Discussion</option>
+
+                                {Object.entries(orderTypes).map(([key, label]) => (
+                                    <option key={key} value={key}>{label}</option>
+                                ))}
                             </Form.Select>
                         </Form.Group>
 
                         <Form.Group className="p-1 my-2 d-flex flex-column justify-content-evenly align-items-start">
                             <Form.Text className="mb-2 ms-1">
-                                Level of education <span className="text-danger">*</span>
+                                Academic Level <span className="text-danger">*</span>
                             </Form.Text>
                             <Form.Select
-                                placeholder="Education Level"
+                                placeholder="Academic Level"
                                 type="text"
                                 name="level"
                                 value={formData.level}
@@ -194,9 +224,10 @@ export const OrderForm = (props) => {
                                 maxLength={50}
                                 required
                             >
-                                <option value="undergraduate" defaultValue>Undergraduate</option>
-                                <option value="graduate">Graduate</option>
-                                <option value="phd">PHD</option>
+
+                                {Object.entries(academicLevels).map(([key, label]) => (
+                                    <option key={key} value={key}>{label}</option>
+                                ))}
                             </Form.Select>
                         </Form.Group>
 
@@ -212,8 +243,23 @@ export const OrderForm = (props) => {
                                 onChange={handleChange}
                                 required
                             >
-                                <option value="english US" defaultValue>English (US)</option>
-                                <option value="english UK">English (UK)</option>
+
+                                {Object.entries(languages).map(([key, label]) => (
+                                    <option key={key} value={key}>{label}</option>
+                                ))}
+                            </Form.Select>
+                        </Form.Group>
+
+                        <Form.Group className="p-1 my-2 d-flex flex-column justify-content-evenly align-items-start">
+                            <Form.Text className="mb-2 ms-1">Citation Style</Form.Text>
+                            <Form.Select
+                                name="style"
+                                value={formData.style}
+                                onChange={handleChange}
+                            >
+                                {Object.entries(citationStyles).map(([key, label]) => (
+                                    <option key={key} value={key}>{label}</option>
+                                ))}
                             </Form.Select>
                         </Form.Group>
 
@@ -227,9 +273,9 @@ export const OrderForm = (props) => {
                                 onChange={handleChange}
                                 required
                             >
-                                <option value="low" defaultValue>Low</option>
-                                <option value="medium">Medium</option>
-                                <option value="high">High</option>
+                                {Object.entries(urgencyLevels).map(([key, label]) => (
+                                    <option key={key} value={key}>{label}</option>
+                                ))}
                             </Form.Select>
                         </Form.Group>
 
@@ -247,23 +293,11 @@ export const OrderForm = (props) => {
                             />
                         </Form.Group>
 
-                        <Form.Group className="p-1 my-2 d-flex flex-column justify-content-evenly align-items-start">
-                            <Form.Text className="mb-2 ms-1">Citation Style</Form.Text>
-                            <Form.Select
-                                name="style"
-                                value={formData.style}
-                                onChange={handleChange}
-                            >
-                                <option value="apa" defaultValue>APA</option>
-                                <option value="mla">MLA</option>
-                                <option value="chicago">Chicago</option>
-                            </Form.Select>
-                        </Form.Group>
-
                     </Col>
+
                 </Row>
 
-                
+                <MultipleFileUpload files={files} setFiles={setFiles} />
 
                 {/* Submit Button */}
                 <Form.Group className="p-1 mt-5 d-flex flex-column justify-content-evenly align-items-start files mx-auto">

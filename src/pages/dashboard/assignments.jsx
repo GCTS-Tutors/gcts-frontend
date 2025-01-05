@@ -10,6 +10,8 @@ import { Comments, Review } from "./orders";
 import { getOrders, updateOrder } from "../../api";
 import solution_img from "../../assets/icons/solution.png";
 import { useAuth } from "../../context/AuthContext";
+import { FaFileDownload } from "react-icons/fa";
+import { getFileNameFromUrl } from "../../utils/utils";
 
 export const AssignmentsTable = (props) => {
     const [userAssignments, setUserAssignments] = useState([]);
@@ -33,7 +35,7 @@ export const AssignmentsTable = (props) => {
                         <tr>
                             <th></th>
                             <th></th>
-                            <th>Topic</th>
+                            <th>Title</th>
                             <th>Status</th>
                             <th>Urgency</th>
                             <th>Deadline</th>
@@ -47,7 +49,7 @@ export const AssignmentsTable = (props) => {
                                 <tr key={assignment.id}>
                                     <td><ViewAssignmentBtn assignment={assignment} /></td>
                                     <td></td>
-                                    <td className="fw-semibold">{assignment.topic}</td>
+                                    <td className="fw-semibold">{assignment.title}</td>
                                     <td className={"small " + ColorUrgency(assignment.status)}>{titleCase(assignment.status)}</td>
                                     <td className={"small " + ColorUrgency(assignment.urgency)}>{titleCase(assignment.urgency)}</td>
                                     <td className="small">{FormatDate(assignment.deadline)}</td>
@@ -92,7 +94,7 @@ export const ViewAssignmentBtn = (props) => {
 
 export const AssignmentDetailsCard = (props) => {
 
-    const { id, topic, deadline, revisions, created_at } = props.data;
+    const { id, title, deadline, revisions, created_at } = props.data;
 
     return (
         <div className="w-100 p-2 d-flex flex-column justify-content-evenly">
@@ -109,7 +111,7 @@ export const AssignmentDetailsCard = (props) => {
                         </div>
                     </Row>
                     <Row className="fw-semibold fs-4 mx-1">
-                        {titleCase(topic)}
+                        {titleCase(title)}
                     </Row>
                     <Row>
                         <small>{FormatTime(created_at)}</small>
@@ -146,6 +148,7 @@ export const AssignmentDetails = (props) => {
         price,
         urgency,
         language,
+        subject,
         min_pages,
         max_pages,
         sources,
@@ -153,7 +156,8 @@ export const AssignmentDetails = (props) => {
         status,
         instructions,
         payment_status,
-        files_link
+        files_link,
+        files
     } = props.data
     return (
         <div className="w-100">
@@ -184,6 +188,10 @@ export const AssignmentDetails = (props) => {
                     </Col>
                     <Col>
                         <Row className="">
+                        <Row className="w-100 my-1">
+                                <Col md={5} className="text-purple smaller">Subject</Col>
+                                <Col md={5} className="small">{titleCase(subject)}</Col>
+                            </Row>
                             <Row className="w-100 my-1">
                                 <Col md={5} className="text-purple smaller">Language</Col>
                                 <Col md={5} className="small">{titleCase(language)}</Col>
@@ -228,8 +236,23 @@ export const AssignmentDetails = (props) => {
                         <Row className="mt-1">{instructions}</Row>
                     </div>
                     <div className="mx-1 mt-3 p-2">
-                        <Row className="text-purple small">Files</Row>
-                        <Row className="mt-1">{files_link ? <a href={files_link} target="_blank" rel="noreferrer" className="site-btn rounded p-2" style={{ width: "fit-content" }}>View Files</a> : "No Files"}</Row>
+                        <Row className="text-purple small">Files Link</Row>
+                        <Row className="mt-1">{files_link ? <a href={files_link} target="_blank" rel="noreferrer" className="site-btn rounded p-2" style={{ width: "fit-content" }}>View Files</a> : "No files link"}</Row>
+                    </div>
+                    <div className="mx-1 mt-3 p-2">
+                        <Row className="text-purple small">Uploaded Files</Row>
+                        <Row>
+                            {files.length > 0 ? (files.map((file, idx) => (
+                                <Col key={idx} className="smaller">
+                                    <a href={file.file}>
+                                        <FaFileDownload className="ms-1" />
+                                        <p className="text-small small">{getFileNameFromUrl(file.file)}</p>
+                                    </a>                                    
+                                </Col>
+                            ))) : (
+                                <p>No files uploaded</p>
+                            )}
+                        </Row>
                     </div>
                 </Row>
             </Row>

@@ -94,7 +94,6 @@ export const ContactUs = () => {
             setModalState("otp");
             setResetTime(600000);
         } catch (error) {
-            console.error("Error sending email:", error);
             setModalState("error");
             setModalMessage(<LoadingSuccessError message="Error sending email. Please try again." icon="error" color="red" />);
             resetStates();
@@ -190,16 +189,16 @@ export const FooterLinks = () => {
     return (
         <ul className="list-unstyled">
             <li className="mb-2">
-                <Link to="/about" className="text-white text-decoration-none">
-                    About
+                <Link to="/" className="text-white text-decoration-none">
+                    Home
                 </Link>
             </li>
             <li className="mb-2">
-                <Link to="/dashboard" className="text-white text-decoration-none">
-                    Dashboard
+                <Link to="/papers" className="text-white text-decoration-none">
+                    Papers
                 </Link>
             </li>
-            <li className="mb-2">
+            {/* <li className="mb-2">
                 <Link to="/papers" className="text-white text-decoration-none">
                     Papers
                 </Link>
@@ -213,7 +212,7 @@ export const FooterLinks = () => {
                 <Link to="/settings" className="text-white text-decoration-none">
                     Settings
                 </Link>
-            </li>
+            </li> */}
         </ul>
     );
 };

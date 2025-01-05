@@ -1,21 +1,20 @@
-// /src/pages/auth/login/registerPage.jsx
+// /src/pages/auth/resetpassword/resetPasswordPage.jsx
 
 import React from "react";
-import {LoginInstead, RegisterForm} from "./registerForm";
 import {HorizontalRule} from "../../../components/elements";
+import { ResetPasswordForm } from "./resetPasswordForm";
 
 
-export const RegisterPage = () => {
+export const ResetPasswordPage = () => {
 
     return (
         <div className="d-flex justify-content-evenly align-items-center">
             <div className="p-5 rounded w-100 my-5 box-shadow-6" style={{maxWidth: "450px"}}>
-                <h1 className="text-center fw-semibold text-purple">Register</h1>
+                <h1 className="text-center fw-semibold text-purple">Reset Password</h1>
 
                 <HorizontalRule ruleStyles={" w-100 border-2 text-purple my-4"} />
-                <RegisterForm />
-                <LoginInstead />
-
+                <ResetPasswordForm  />
+                
             </div>
         </div>
 

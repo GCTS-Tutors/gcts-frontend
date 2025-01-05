@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import ReactStars from "react-stars";
 import { Form, Button } from "react-bootstrap";
 import { FormatTime } from "../../components/date_time";
 import { createOrderComment, getOrderComments, createOrderReview } from "../../api";
@@ -28,6 +29,7 @@ export const Comments = ({ order }) => {
                 const response = await getOrderComments(order);
                 setComments(response);
             } catch (error) {
+                // TODO: Replace with a modal notification
                 console.error("Error adding comment:", error);
             }
         }
@@ -112,9 +114,14 @@ export const Comment = ({ comment, currentUser }) => {
 
 
 export const Review = ({ order }) => {
+    const [rating, setRating] = useState(5);
     const [review, setReview] = useState("");
     const [validated, setValidated] = useState(false);
     const [reviewError, setReviewError] = useState(false);
+
+    const handleRatingChange = (newRating) => {
+        setRating(newRating);
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -129,13 +136,15 @@ export const Review = ({ order }) => {
 
         // Assume onSubmit is the function to handle comment submission
         try {
-            const response = await createOrderReview({'order': order, 'review': review});
+            const response = await createOrderReview({ 'order': order, 'review': review, 'rating': rating });
         } catch (e) {
+            // TODO: Replace with a modal notification
             console.error(e);
         }
 
         // Reset form state after successful submission
         setReview("");
+        setRating(5);
         setValidated(false);
         setReviewError(false);
     };
@@ -146,6 +155,16 @@ export const Review = ({ order }) => {
             <h5 className="text-purple fw-semibold me-1 text-center">Review</h5>
             {/* Add new comment */}
             <Form noValidate validated={validated} onSubmit={handleSubmit} className="mt-3">
+                <div className="d-flex justify-content-center">
+                    <ReactStars
+                        count={5}
+                        value={rating}
+                        onChange={handleRatingChange}
+                        size={32}
+                        color2={"#ffd700"}
+                    />
+                </div>
+                
                 <Form.Group className="mb-3">
                     <Form.Control
                         as="textarea"

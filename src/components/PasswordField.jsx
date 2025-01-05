@@ -36,7 +36,7 @@ const PasswordField = ({
           {showPassword ? <FaEyeSlash /> : <FaEye />}
         </InputGroup.Text>
       <Form.Control.Feedback type="invalid">
-        {errors && errors.map((error, index) => (
+        {errors?.map((error, index) => (
           <div key={index}>
             <small className="small text-danger">{error}</small>
           </div>

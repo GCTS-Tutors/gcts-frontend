@@ -73,7 +73,7 @@ export const LoginForm = () => {
         };
 
         setErrors(formErrors);
-        return Object.keys(formErrors).every((key) => !formErrors[key]);
+        return Object.values(formErrors).every((errorArray) => errorArray.length === 0);
     };
 
     const handleSubmit = async (e) => {
@@ -96,10 +96,10 @@ export const LoginForm = () => {
                 <HorizontalRule ruleStyles={" w-100 border-2 text-purple my-4"} />
                 <Form onSubmit={handleSubmit}>
                     <Form.Group className="mb-3 d-flex flex-column justify-items-evenly align-items-start">
-                        <Form.Label className="text-purple">Username</Form.Label>
+                        <Form.Label className="text-purple">Username/Email</Form.Label>
                         <Form.Control
                             type="text"
-                            placeholder="Enter username"
+                            placeholder="Username or email"
                             name="username"
                             value={formData.username}
                             onChange={handleChange}
@@ -108,13 +108,14 @@ export const LoginForm = () => {
                             isValid={formData.username.length > 0 && (!errors.username || errors.username.length === 0)}
                         />
                         <Form.Control.Feedback type="invalid" className="text-start">
-                            {errors.username && errors.username.map((error, index) => (
+                            {errors.username?.map((error, index) => (
                                 <div key={index}><small className="small text-danger">{error}</small></div>
                             ))}
                         </Form.Control.Feedback>
                     </Form.Group>
 
                     <PasswordField label={"Password"} name={"password"} placeholder={"Enter password"} value={formData.password} onChange={handleChange} errors={errors.password} />
+                    
 
                     <Button variant="primary" type="submit" className="w-100 site-btn btn mt-3" disabled={loading}>
                         {loading ? "Logging in..." : "Login"}
@@ -125,7 +126,12 @@ export const LoginForm = () => {
                     <div className="text-center">
                         <span className="d-flex flex-wrap justify-content-evenly align-items-center">
                             <span>Don't have an account?</span>
-                            <Link to="/register" className="link-purple small"> Register</Link>
+                            <Link to="/register" className="link-purple small">Register</Link>
+                        </span>
+                    </div>
+                    <div className="text-center">
+                        <span className="d-flex flex-wrap justify-content-evenly align-items-center">
+                            <Link to="/resetpassword" className="link-purple small"> Forgot Password?</Link>
                         </span>
                     </div>
                 </Form>

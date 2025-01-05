@@ -12,9 +12,9 @@ export const ModalContent = ({ type, message }) => {
             case "loading":
                 return <Spinner animation="border" variant="primary" />;
             case "success":
-                return <CheckCircle size={32} color="green" />;
+                return <CheckCircle size={64} color="green" />;
             case "error":
-                return <XCircle size={32} color="red" />;
+                return <XCircle size={64} color="red" />;
             default:
                 return null;
         }

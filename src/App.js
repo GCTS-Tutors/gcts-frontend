@@ -9,6 +9,7 @@ import {CustomFooter} from "./components/footer";
 import {Settings} from "./pages/dashboard/settings";
 import { LoginPage } from './pages/auth/login/loginPage';
 import { RegisterPage } from './pages/auth/register/registerPage';
+import { ResetPasswordPage } from './pages/auth/resetpassword/resetPasswordPage';
 import PrivateRoute from './PrivateRoute';
 import {FaqsView} from "./components/faqs";
 
@@ -21,7 +22,7 @@ function App() {
                 <Routes>
                     <Route path='/' element={<LandingPage/>}/>
                     <Route path='/papers' element={<BlogView/>}/>
-                    <Route path='/faqs' element={<FaqsView/>}/>
+                    {/* <Route path='/faqs' element={<FaqsView/>}/> */}
                     <Route
                         path='/dashboard' 
                         element={
@@ -41,10 +42,11 @@ function App() {
                     />
                     <Route path='/login' element={<LoginPage />}/>
                     <Route path='/register' element={<RegisterPage />}/>
+                    <Route path='/resetpassword' element={<ResetPasswordPage />}/>
                     <Route path='*' element={<LandingPage/>}/>
 
                     {/* UNDER REVIEW - SHOULD BE UNDER DASHBOARD */}
-                    <Route path='/settings' element={<Settings/>}/>
+                    {/* <Route path='/settings' element={<Settings/>}/> */}
                 </Routes>
                 <CustomFooter/>
             </Router>

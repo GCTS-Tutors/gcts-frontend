@@ -1,6 +1,7 @@
 // src/api/axios.js
 import axios from 'axios';
 
+
 const BASE_URL = process.env.REACT_APP_API_BASE_URL;
 // Axios instance to be reused throughout the app
 const api = axios.create({
@@ -33,7 +34,7 @@ api.interceptors.response.use(
         const originalRequest = error.config;
 
         // Check if the error status is 401 and the request is not already retried
-        if (error.response.status === 401 && !originalRequest._retry) {
+        if (error.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
 
             try {
@@ -66,7 +67,7 @@ api.interceptors.response.use(
                 return api(originalRequest);
             } catch (refreshError) {
                 // If the refresh token request also results in a 401, handle the error
-                if (refreshError.response && refreshError.response.status === 401) {
+                if (refreshError.response && refreshError.response?.status === 401) {
                     localStorage.removeItem('token');
                     localStorage.removeItem('refreshToken');
                     // Optionally, redirect to login page

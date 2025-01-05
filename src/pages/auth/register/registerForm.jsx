@@ -1,18 +1,17 @@
-import React, {useEffect, useState} from "react";
-import {Button, Form, InputGroup, Spinner} from "react-bootstrap";
-import {Link, useNavigate} from "react-router-dom";
-import {CustomModal} from "../../../components/modal";
-import {CheckCircle, XCircle} from "phosphor-react";
-import {HorizontalRule} from "../../../components/elements";
-import {generateOTP, registerUser, verifyOTP} from "../../../api";
-import {useAuth} from "../../../context/AuthContext";
+import React, { useEffect, useState } from "react";
+import { Button, Form, Spinner } from "react-bootstrap";
+import { Link, useNavigate } from "react-router-dom";
+import { CustomModal } from "../../../components/modal";
+import { CheckCircle, XCircle } from "phosphor-react";
+import { HorizontalRule } from "../../../components/elements";
+import { generateOTP, registerUser, verifyOTP } from "../../../api";
+import { useAuth } from "../../../context/AuthContext";
 import OTPForm from "../../../components/OTPForm";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
 import PasswordField from "../../../components/PasswordField";
 
 
 export const RegisterForm = () => {
-    const {login} = useAuth();
+    const { login } = useAuth();
     const timeout = 3000;
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
@@ -109,8 +108,8 @@ export const RegisterForm = () => {
     };
 
     const handleChange = (e) => {
-        const {name, value} = e.target;
-        setFormData({...formData, [name]: value});
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
     };
 
     const handleOtpSubmit = async (otp) => {
@@ -134,10 +133,10 @@ export const RegisterForm = () => {
                 if (error.response.status === 400) {
                     // Check for username already exists
                     if (error.response.data.username) {
-                        setErrors({username: error.response.data.username});
+                        setErrors({ username: error.response.data.username });
                     }
                     if (error.response.data.email) {
-                        setErrors({email: error.response.data.email});
+                        setErrors({ email: error.response.data.email });
                     }
                 }
                 setError("Registration failed. Please try again.");
@@ -202,7 +201,7 @@ export const RegisterForm = () => {
                             isValid={formData.username.length > 0 && (!errors.username || errors.username.length === 0)}
                         />
                         <Form.Control.Feedback type="invalid">
-                            {errors.username && errors.username.map((error, index) => (
+                            {errors.username?.map((error, index) => (
                                 <div key={index}><small className="small text-danger">{error}</small></div>
                             ))}
                         </Form.Control.Feedback>
@@ -220,11 +219,11 @@ export const RegisterForm = () => {
                             isValid={formData.email.length > 0 && (!errors.email || errors.email.length === 0)}
                         />
                         <Form.Control.Feedback type="invalid">
-                            {errors.email && errors.email.map((error, index) => (
+                            {errors.email?.map((error, index) => (
                                 <div key={index}><small className="small text-danger">{error}</small></div>
                             ))}
                         </Form.Control.Feedback>
-                    </Form.Group>                 
+                    </Form.Group>
 
                     <PasswordField label={"Password"} name={"password"} placeholder={"Enter password"} value={formData.password} onChange={handleChange} errors={errors.password} />
 
@@ -246,7 +245,7 @@ export const RegisterForm = () => {
                         modal_body: (
                             <div className="align-items-center justify-content-center d-flex">
                                 <div className="text-center">
-                                    <Spinner animation="border" variant="primary"/>
+                                    <Spinner animation="border" variant="primary" />
                                     <p>{loadingMessage}</p>
                                 </div>
                             </div>
@@ -265,7 +264,7 @@ export const RegisterForm = () => {
                         modal_body: (
                             <div className="align-items-center justify-content-center d-flex">
                                 <div className="text-center">
-                                    <CheckCircle size={32} color="green"/>
+                                    <CheckCircle size={32} color="green" />
                                     <p>Registration Successful!</p>
                                 </div>
                             </div>
@@ -285,7 +284,7 @@ export const RegisterForm = () => {
                         modal_body: (
                             <div className="align-items-center justify-content-center d-flex">
                                 <div className="text-center">
-                                    <XCircle size={32} color="red"/>
+                                    <XCircle size={32} color="red" />
                                     <p>{error}</p>
                                 </div>
                             </div>
@@ -302,7 +301,7 @@ export const RegisterForm = () => {
                 <CustomModal
                     data={{
                         modal_title: "OTP Email Verification",
-                        modal_body: <OTPForm onSubmit={handleOtpSubmit}/>,
+                        modal_body: <OTPForm onSubmit={handleOtpSubmit} />,
                         show_state: otpModal,
                         modal_size: "md",
                     }}
@@ -315,13 +314,13 @@ export const RegisterForm = () => {
 export const LoginInstead = () => {
     return (
         <div>
-            <HorizontalRule ruleStyles="w-100 border-2 text-purple my-4"/>
+            <HorizontalRule ruleStyles="w-100 border-2 text-purple my-4" />
 
             <div className="text-center">
-                        <span className="d-flex flex-wrap justify-content-evenly align-items-center">
-                            <span>Already have an account?</span>
-                            <Link to="/login" className="small site-link link-purple"> Login</Link>
-                        </span>
+                <span className="d-flex flex-wrap justify-content-evenly align-items-center">
+                    <span>Already have an account?</span>
+                    <Link to="/login" className="small site-link link-purple">Login</Link>
+                </span>
             </div>
         </div>
     )

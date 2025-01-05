@@ -42,13 +42,13 @@ export const CustomNavbar = () => {
                                         </Link>
                                     </Nav.Link>
 
-                                    <Nav.Link className="p-2 mx-2">
+                                    {/* <Nav.Link className="p-2 mx-2">
                                         <Link to="/faqs"
                                               className="w-100 d-flex flex-row justify-content-center align-items-center">
                                             <span className="me-2"><Info size={24} color="black"/></span>
                                             <span>FAQs</span>
                                         </Link>
-                                    </Nav.Link>
+                                    </Nav.Link> */}
                                 </div>
                                 <div className="mx-1 w-40 d-flex flex-column flex-md-row justify-content-end align-items-center">
                                     {user ? (

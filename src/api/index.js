@@ -1,6 +1,5 @@
 // src/api/index.js
 import api from './axios';
-import axios from 'axios';
 
 
 // User Auth API Calls
@@ -39,52 +38,58 @@ export const getUser = async () => {
     return null;
 };
 
+export const resetPassword = async (email, password) => {
+    const response = await api.post('/auth/reset-password/', { email, password });
+    return response.data;
+};
 
 // OTPs
-export const generateOTP = async (email) => {
-    const response = await api.post('/generate-otp/', { email });
+export const generateOTP = async (email, is_account=false) => {
+    const response = await api.post('/generate-otp/', { email, is_account });
     if (response.status === 200) {
         return (true, response.data);
     }
     return (false, response.data);
 };
 
-export const verifyOTP = async (email, otp) => {
-    const response = await api.post('/verify-otp/', { email, otp });
+export const verifyOTP = async (email, otp, is_account=false) => {
+    const response = await api.post('/verify-otp/', { email, otp, is_account });
     if (response.status === 200) {
         return (true, response.data);
     }
     return (false, response.data);
 };
-
 
 // Order calls
 export const createOrder = async (data) => {
-    const response = await api.post('/orders/', data);
+    const response = await api.post('/orders/', data, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        }
+    });
     return response.data;
-}
+};
 
 export const getOrders = async () => {
     const response = await api.get('/orders');
     return response.data;
-}
+};
 
 export const getOrder = async (id) => {
     const response = await api.get(`/orders/${id}`);
     return response.data;
-}
+};
 
 export const updateOrder = async (id, data) => {
     const response = await api.patch(`/orders/${id}/`, data);
     return response.data;
-}
-
+};
 
 // Order reviews
 export const createOrderReview = async (data) => {
     const response = await api.post('/reviews/', data);
     return response.data;
-}
+};
 
 export const getReviews = async () => {
     try {
@@ -104,45 +109,43 @@ export const getReviews = async () => {
             created_at: "2024-08-01",
         }];
     }
-}
-
+};
 
 // Order comments
 export const createOrderComment = async (data) => {
     const response = await api.post('/comments/', data);
     return response.data;
-}
+};
 
 export const getOrderComments = async (order_id) => {
     const response = await api.get(`/comments/?order=${order_id}`);
     return response.data;
-}
+};
 
 // Inquiries
 export const createInquiry = async (data) => {
     const response = await api.post('/inquiries/', data);
     return response.data;
-}
+};
 
 export const getInquiries = async () => {
     const response = await api.get('/inquiries/');
     return response.data;
-}
+};
 
 // Papers
 export const getPapers = async () => {
     const response = await api.get('/papers/');
     return response.data;
-}
+};
 
 export const getPaper = async (id) => {
     const response = await api.get(`/papers/${id}`);
     return response.data;
-}
-
+};
 
 // UserPapers
 export const getUserPapers = async () => {
     const response = await api.get('/users/get_user_papers/');
     return response.data;
-}
+};

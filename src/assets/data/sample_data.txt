@@ -1,0 +1,450 @@
+USERS
+
+[
+    {
+        "id": 1,
+        "password": "@johndoe!",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "johndoe",
+        "first_name": "John",
+        "last_name": "Doe",
+        "email": "grantcstutor@gmail.com",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2024-06-23T12:39:36.246503Z",
+        "role": "student",
+        "groups": [],
+        "user_permissions": []
+    },
+    {
+        "id": 2,
+        "password": "@writerone!",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "writerone",
+        "first_name": "Writer",
+        "last_name": "One",
+        "email": "writerone@mail.com",
+        "is_staff": true,
+        "is_active": true,
+        "date_joined": "2024-06-23T12:41:13.600942Z",
+        "role": "staff",
+        "groups": [],
+        "user_permissions": []
+    },
+    {
+        "id": 3,
+        "password": "@ogonsarigo!",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "gonsarigo",
+        "first_name": "George",
+        "last_name": "Onsarigo",
+        "email": "georgeonsarigo5@gmail.com",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2024-06-23T15:15:22.934121Z",
+        "role": "staff",
+        "groups": [],
+        "user_permissions": []
+    },
+    {
+        "id": 4,
+        "password": "pbkdf2_sha256$720000$CiPz5feHyUlvVYhkElLj1z$9OCiyWQpREPMHxniMid+UBypUflpJfJyhX7XlVVw2s8=",
+        "last_login": "2024-08-01T10:02:58.887544Z",
+        "is_superuser": true,
+        "username": "grandcanyon",
+        "first_name": "",
+        "last_name": "",
+        "email": "",
+        "is_staff": true,
+        "is_active": true,
+        "date_joined": "2024-08-01T10:02:02.068059Z",
+        "role": "",
+        "groups": [],
+        "user_permissions": []
+    }
+]
+
+
+ORDERS
+
+[
+    {
+        "id": 1,
+        "topic": "Managing Infectious Diseases",
+        "type": "research paper",
+        "level": "undergraduate",
+        "language": "english US",
+        "pages": 5,
+        "status": "pending",
+        "urgency": "low",
+        "instructions": "Write a 5 page research paper on managing infectious diseases.",
+        "deadline": "2024-08-22T13:06:00Z",
+        "sources": 4,
+        "style": "chicago",
+        "price": 100,
+        "payment_status": "pending",
+        "created_at": "2024-08-01T10:54:25.037056Z",
+        "updated_at": "2024-08-01T10:54:25.037056Z",
+        "user": 4,
+        "assigned_to": 2
+    },
+    {
+        "id": 2,
+        "topic": "Covi",
+        "type": "essay",
+        "level": "undergraduate",
+        "language": "english US",
+        "pages": 3,
+        "status": "pending",
+        "urgency": "medium",
+        "instructions": "Write a 3 page essay on Covid-19",
+        "deadline": "2024-08-22T13:06:00Z",
+        "sources": 3,
+        "style": "mla",
+        "price": 100,
+        "payment_status": "pending",
+        "created_at": "2024-08-01T10:55:49.471369Z",
+        "updated_at": "2024-08-01T10:55:49.471369Z",
+        "user": 4,
+        "assigned_to": 2
+    },
+    {
+        "id": 3,
+        "topic": "Nursing Capstone Project",
+        "type": "capstone project",
+        "level": "undergraduate",
+        "language": "english US",
+        "pages": 19,
+        "status": "pending",
+        "urgency": "medium",
+        "instructions": "Select a topic and write a 20-page capstone project on it, following the guidelines on Canvas.",
+        "deadline": "2024-08-22T13:06:00Z",
+        "sources": 8,
+        "style": "apa",
+        "price": 1000,
+        "payment_status": "pending",
+        "created_at": "2024-08-01T10:57:06.507305Z",
+        "updated_at": "2024-08-01T10:57:06.507305Z",
+        "user": 4,
+        "assigned_to": 2
+    },
+    {
+        "id": 4,
+        "topic": "Administering drugs to aged people",
+        "type": "class discussion",
+        "level": "undergraduate",
+        "language": "english US",
+        "pages": 1,
+        "status": "pending",
+        "urgency": "high",
+        "instructions": "Write one page response to today's class discussion: Administering drugs to aged people",
+        "deadline": "2024-08-22T13:06:00Z",
+        "sources": 5,
+        "style": "turabian",
+        "price": 200,
+        "payment_status": "pending",
+        "created_at": "2024-08-01T10:58:10.917752Z",
+        "updated_at": "2024-08-01T10:58:10.917752Z",
+        "user": 4,
+        "assigned_to": 2
+    }
+]
+
+ORDERFILES
+
+[
+    {
+        "id": 1,
+        "file": "http://localhost:8000/media/order_files/2023_guide_cv_SmsOuSx.pdf",
+        "created_at": "2024-07-23T18:39:43.617415Z",
+        "updated_at": "2024-07-23T18:39:43.617415Z",
+        "order": 1
+    },
+    {
+        "id": 2,
+        "file": "http://localhost:8000/media/order_files/kenya-buying-guide-residential-10853.pdf",
+        "created_at": "2024-07-23T18:39:43.676800Z",
+        "updated_at": "2024-07-23T18:39:43.676800Z",
+        "order": 1
+    },
+    {
+        "id": 3,
+        "file": "http://localhost:8000/media/order_files/kenya-buying-guide-residential-10853_p7sHvvs.pdf",
+        "created_at": "2024-07-23T18:41:26.390092Z",
+        "updated_at": "2024-08-01T11:10:00.261214Z",
+        "order": 3
+    },
+    {
+        "id": 4,
+        "file": "http://localhost:8000/media/order_files/2023_guide_cv_rxvRuOP.pdf",
+        "created_at": "2024-07-23T18:41:26.460675Z",
+        "updated_at": "2024-08-01T11:10:56.903852Z",
+        "order": 2
+    },
+    {
+        "id": 5,
+        "file": "http://localhost:8000/media/order_files/2023_guide_cv_OAedNw2.pdf",
+        "created_at": "2024-07-23T18:41:26.502753Z",
+        "updated_at": "2024-07-23T18:41:26.502753Z",
+        "order": 1
+    },
+    {
+        "id": 6,
+        "file": "http://localhost:8000/media/order_files/kenya-buying-guide-residential-10853_PflSZ6o.pdf",
+        "created_at": "2024-07-23T18:41:26.555852Z",
+        "updated_at": "2024-07-23T18:41:26.555852Z",
+        "order": 1
+    },
+    {
+        "id": 7,
+        "file": "http://localhost:8000/media/order_files/2023_guide_cv_X1rUI9o.pdf",
+        "created_at": "2024-07-23T18:48:46.177574Z",
+        "updated_at": "2024-07-23T18:48:46.177574Z",
+        "order": 1
+    },
+    {
+        "id": 8,
+        "file": "http://localhost:8000/media/order_files/kenya-buying-guide-residential-10853_yLN6cIk.pdf",
+        "created_at": "2024-07-23T18:48:46.269142Z",
+        "updated_at": "2024-07-23T18:48:46.269142Z",
+        "order": 1
+    }
+]
+
+
+ORDERCOMMENTS
+
+[
+    {
+        "id": 1,
+        "comment": "Please submit deposit for work to start.",
+        "created_at": "2024-08-01T11:11:27.888385Z",
+        "updated_at": "2024-08-01T11:11:27.888385Z",
+        "user": 1,
+        "order": 1
+    },
+    {
+        "id": 2,
+        "comment": "Elaborate on what aspects of Covid-19 the essay should be on.",
+        "created_at": "2024-08-01T11:18:14.652647Z",
+        "updated_at": "2024-08-01T11:18:14.652647Z",
+        "user": 4,
+        "order": 2
+    },
+    {
+        "id": 3,
+        "comment": "The cause, effect and spread",
+        "created_at": "2024-08-01T11:18:36.454539Z",
+        "updated_at": "2024-08-01T11:18:36.454539Z",
+        "user": 4,
+        "order": 2
+    },
+    {
+        "id": 4,
+        "comment": "Thank you for elaborating",
+        "created_at": "2024-08-01T11:18:48.745477Z",
+        "updated_at": "2024-08-01T11:18:48.745477Z",
+        "user": 4,
+        "order": 2
+    },
+    {
+        "id": 5,
+        "comment": "Please clarify the style to be used",
+        "created_at": "2024-08-01T11:19:12.721484Z",
+        "updated_at": "2024-08-01T11:19:12.721484Z",
+        "user": 4,
+        "order": 3
+    },
+    {
+        "id": 6,
+        "comment": "APA",
+        "created_at": "2024-08-01T11:19:28.127066Z",
+        "updated_at": "2024-08-01T11:19:28.127066Z",
+        "user": 4,
+        "order": 3
+    },
+    {
+        "id": 7,
+        "comment": "Great. Is a cover letter required?",
+        "created_at": "2024-08-01T11:20:07.480851Z",
+        "updated_at": "2024-08-01T11:20:07.480851Z",
+        "user": 4,
+        "order": 4
+    },
+    {
+        "id": 8,
+        "comment": "Great. Will deliver in the next few days.",
+        "created_at": "2024-08-01T11:20:29.988402Z",
+        "updated_at": "2024-08-01T11:20:29.988402Z",
+        "user": 4,
+        "order": 4
+    }
+]
+
+
+REVIEWS
+
+[
+    {
+        "id": 1,
+        "review": "Great work",
+        "created_at": "2024-08-01T11:20:40.103687Z",
+        "updated_at": "2024-08-01T11:20:40.103687Z",
+        "order": 1
+    },
+    {
+        "id": 2,
+        "review": "Fantastic job",
+        "created_at": "2024-08-01T11:20:50.728295Z",
+        "updated_at": "2024-08-01T11:20:50.728295Z",
+        "order": 2
+    },
+    {
+        "id": 3,
+        "review": "Did several revisions but overall great work",
+        "created_at": "2024-08-01T11:21:08.788389Z",
+        "updated_at": "2024-08-01T11:21:08.788389Z",
+        "order": 3
+    },
+    {
+        "id": 4,
+        "review": "Couldn't be any better",
+        "created_at": "2024-08-01T11:21:22.915788Z",
+        "updated_at": "2024-08-01T11:21:22.915788Z",
+        "order": 4
+    }
+]
+
+SOLUTIONS
+
+[
+    {
+        "id": 1,
+        "status": "accepted",
+        "created_at": "2024-08-01T11:21:30.240117Z",
+        "updated_at": "2024-08-01T11:21:30.240117Z",
+        "order": 1
+    },
+    {
+        "id": 2,
+        "status": "revision requested",
+        "created_at": "2024-08-01T11:21:35.760809Z",
+        "updated_at": "2024-08-01T11:21:35.760809Z",
+        "order": 2
+    },
+    {
+        "id": 3,
+        "status": "rejected",
+        "created_at": "2024-08-01T11:21:43.546149Z",
+        "updated_at": "2024-08-01T11:21:43.546149Z",
+        "order": 4
+    },
+    {
+        "id": 4,
+        "status": "accepted",
+        "created_at": "2024-08-01T11:21:51.631795Z",
+        "updated_at": "2024-08-01T11:21:51.631795Z",
+        "order": 3
+    }
+]
+
+SOLUTIONFILES
+
+[
+    {
+        "id": 1,
+        "file": "http://localhost:8000/media/solution_files/kenya-buying-guide-residential-10853.pdf",
+        "created_at": "2024-08-01T11:22:37.416803Z",
+        "updated_at": "2024-08-01T11:22:37.416803Z",
+        "solution": 1
+    },
+    {
+        "id": 2,
+        "file": "http://localhost:8000/media/solution_files/ONLINE-APPLICATION-admision-process.pdf",
+        "created_at": "2024-08-01T11:23:00.144640Z",
+        "updated_at": "2024-08-01T11:23:00.144640Z",
+        "solution": 2
+    }
+]
+
+SOLUTION COMMENTS
+
+[
+    {
+        "id": 1,
+        "comment": "Thank you",
+        "created_at": "2024-08-01T11:23:19.547153Z",
+        "updated_at": "2024-08-01T11:23:19.547153Z",
+        "solution": 1
+    },
+    {
+        "id": 2,
+        "comment": "Clarify on which areas need revision",
+        "created_at": "2024-08-01T11:23:35.927499Z",
+        "updated_at": "2024-08-01T11:23:35.927499Z",
+        "solution": 2
+    },
+    {
+        "id": 3,
+        "comment": "Revision submitted. Please review.",
+        "created_at": "2024-08-01T11:24:44.895753Z",
+        "updated_at": "2024-08-01T11:24:44.895753Z",
+        "solution": 3
+    }
+]
+
+PAYMENTS
+
+[
+    {
+        "id": 1,
+        "amount": 100,
+        "transaction_id": "T01",
+        "payment_method": "PayPal",
+        "payment_status": "Completed",
+        "created_at": "2024-08-01T09:17:39.988738Z",
+        "updated_at": "2024-08-01T09:17:39.988738Z",
+        "user": 1,
+        "order": null
+    },
+    {
+        "id": 2,
+        "amount": 50,
+        "transaction_id": "T02",
+        "payment_method": "PayPal",
+        "payment_status": "Completed",
+        "created_at": "2024-08-01T09:17:58.864036Z",
+        "updated_at": "2024-08-01T09:17:58.864036Z",
+        "user": 1,
+        "order": null
+    },
+    {
+        "id": 3,
+        "amount": 500,
+        "transaction_id": "T03",
+        "payment_method": "Payoneer",
+        "payment_status": "Completed",
+        "created_at": "2024-08-01T09:18:18.401757Z",
+        "updated_at": "2024-08-01T09:18:18.401757Z",
+        "user": 1,
+        "order": null
+    }
+]
+
+
+STATISTICS
+
+
+[
+    {
+        "id": 1,
+        "students_assissted": 100,
+        "papers_written": 2011,
+        "experts": 10,
+        "created_at": "2024-08-01T09:16:50.141299Z",
+        "updated_at": "2024-08-01T09:16:50.148352Z"
+    }
+]

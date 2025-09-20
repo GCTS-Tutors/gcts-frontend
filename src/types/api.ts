@@ -100,26 +100,42 @@ export interface Subject {
 
 export interface Order {
   id: number;
-  orderNumber: string;
-  student: User;
+  orderNumber?: string;
+  student?: User;
+  user?: User; // Backend format
   writer?: User;
+  assigned_to?: User; // Backend format
   subject: Subject;
-  orderType: OrderType;
-  academicLevel: AcademicLevel;
+  orderType?: OrderType;
+  order_type?: string; // Backend format
+  type?: string; // Backend format
+  academicLevel?: AcademicLevel;
+  academic_level?: string; // Backend format
+  level?: string; // Backend format
   title: string;
-  description: string;
+  description?: string;
   instructions: string;
-  pages: number;
-  citationStyle: CitationStyle;
+  pages?: number;
+  min_pages?: number; // Backend format
+  max_pages?: number; // Backend format
+  sources?: number; // Backend format
+  citationStyle?: CitationStyle;
+  citation_style?: string; // Backend format
+  language?: string; // Backend format
+  urgency?: string; // Backend format
   deadline: string;
   status: OrderStatus;
-  price: number;
-  isPaid: boolean;
-  createdAt: string;
-  updatedAt: string;
-  files: OrderFile[];
-  comments: OrderComment[];
-  reviews: OrderReview[];
+  price?: number;
+  total_price?: number; // Backend format
+  isPaid?: boolean;
+  is_paid?: boolean; // Backend format
+  createdAt?: string;
+  created_at?: string; // Backend format
+  updatedAt?: string;
+  updated_at?: string; // Backend format
+  files?: OrderFile[];
+  comments?: OrderComment[];
+  reviews?: OrderReview[];
 }
 
 export interface OrderFile {

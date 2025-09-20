@@ -194,35 +194,46 @@ api.interceptors.response.use(
 
     if (error.response?.data) {
       const errorData = error.response.data as any;
-      
-      // Handle new backend error format (from custom_exception_handler)
-      if (errorData.error && typeof errorData.error === 'object') {
-        const backendError = errorData.error;
-        apiError.message = backendError.message || apiError.message;
-        apiError.code = backendError.code;
-        apiError.error_id = backendError.error_id;
-        apiError.timestamp = backendError.timestamp;
-        apiError.details = backendError.details;
-        
-        // Handle field-specific errors from details
-        if (backendError.details) {
-          if (backendError.details.field) {
-            apiError.field = backendError.details.field;
-          }
-          
-          // Handle DRF validation errors nested in details
-          if (backendError.details && typeof backendError.details === 'object') {
-            // Look for field validation errors in details
-            const fieldErrors = Object.keys(backendError.details).find(key => 
-              Array.isArray(backendError.details[key]) && 
-              typeof backendError.details[key][0] === 'string'
-            );
-            
-            if (fieldErrors) {
-              apiError.field = fieldErrors;
-              apiError.message = backendError.details[fieldErrors][0];
+
+      // Handle new standardized backend error format
+      if (errorData.error) {
+        if (typeof errorData.error === 'string') {
+          apiError.message = errorData.error;
+        } else if (typeof errorData.error === 'object') {
+          const backendError = errorData.error;
+          apiError.message = backendError.message || apiError.message;
+          apiError.code = backendError.code;
+          apiError.error_id = backendError.error_id;
+          apiError.timestamp = backendError.timestamp;
+          apiError.details = backendError.details;
+
+          // Handle field-specific errors from details
+          if (backendError.details) {
+            if (backendError.details.field) {
+              apiError.field = backendError.details.field;
+            }
+
+            // Handle DRF validation errors nested in details
+            if (backendError.details && typeof backendError.details === 'object') {
+              // Look for field validation errors in details
+              const fieldErrors = Object.keys(backendError.details).find(key =>
+                Array.isArray(backendError.details[key]) &&
+                typeof backendError.details[key][0] === 'string'
+              );
+
+              if (fieldErrors) {
+                apiError.field = fieldErrors;
+                apiError.message = backendError.details[fieldErrors][0];
+              }
             }
           }
+        }
+      }
+      // Handle details field directly (our new backend format)
+      else if (errorData.details) {
+        apiError.details = errorData.details;
+        if (errorData.details.field) {
+          apiError.field = errorData.details.field;
         }
       }
       // Handle legacy error formats
@@ -232,10 +243,8 @@ api.interceptors.response.use(
         apiError.message = errorData.message;
       } else if (errorData.detail) {
         apiError.message = errorData.detail;
-      } else if (errorData.error && typeof errorData.error === 'string') {
-        apiError.message = errorData.error;
       }
-      
+
       // Handle DRF field-specific errors (legacy format)
       if (errorData.errors && typeof errorData.errors === 'object') {
         const firstField = Object.keys(errorData.errors)[0];

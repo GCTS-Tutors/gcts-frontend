@@ -1,12 +1,13 @@
 import { APIClient } from '@/lib/api';
-import { 
-  AuthTokens, 
-  LoginRequest, 
-  RegisterRequest, 
+import {
+  AuthTokens,
+  LoginRequest,
+  RegisterRequest,
   PasswordResetRequest,
   PasswordResetConfirm,
-  User 
+  User
 } from '@/types/api';
+import { transformUser } from '@/utils/dataTransformers';
 
 export class AuthService {
   /**
@@ -15,7 +16,15 @@ export class AuthService {
   static async login(credentials: LoginRequest): Promise<AuthTokens> {
     console.log('🔐 AuthService.login called with:', credentials);
     console.log('🔗 Will call URL:', '/auth/login/');
-    return APIClient.post<AuthTokens>('/auth/login/', credentials);
+
+    const response = await APIClient.post<any>('/auth/login/', credentials);
+
+    // Map backend response to frontend AuthTokens type
+    return {
+      access: response.access,
+      refresh: response.refresh,
+      user: transformUser(response.user)
+    };
   }
 
   /**
@@ -47,7 +56,17 @@ export class AuthService {
    * Get current authenticated user profile
    */
   static async getCurrentUser(): Promise<User> {
-    return APIClient.get<User>('/auth/user/');
+    const response = await APIClient.get<any>('/auth/user/');
+    return transformUser(response);
+  }
+
+  /**
+   * Map backend user permissions to frontend role
+   */
+  private static mapUserRole(user: any): UserRole {
+    if (user.is_superuser) return 'admin';
+    if (user.is_staff) return 'writer';
+    return 'student';
   }
 
   /**

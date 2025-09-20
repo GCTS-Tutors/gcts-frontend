@@ -5,6 +5,7 @@ export { UserService } from './userService';
 export { PaymentService } from './paymentService';
 export { NotificationService } from './notificationService';
 export { AdminService } from './adminService';
+export { DashboardService } from './dashboardService';
 
 // Re-export types for convenience
 export type {

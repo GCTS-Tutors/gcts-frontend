@@ -50,7 +50,7 @@ function OrderPaymentPage({ params }: OrderPaymentPageProps) {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
-  const { data: order, isLoading: orderLoading } = useGetOrderQuery(parseInt(params.id));
+  const { data: order, isLoading: orderLoading } = useGetOrderQuery(params.id);
   const [createPaymentIntent, { isLoading: creatingIntent }] = useCreatePaymentIntentMutation();
   const [confirmPayment, { isLoading: confirmingPayment }] = useConfirmPaymentMutation();
 
@@ -71,7 +71,7 @@ function OrderPaymentPage({ params }: OrderPaymentPageProps) {
     try {
       // Create payment intent
       const paymentIntent = await createPaymentIntent({
-        orderId: parseInt(params.id),
+        orderId: params.id,
         paymentMethod: paymentMethod as any,
         amount: order?.price || 0,
         currency: 'USD',

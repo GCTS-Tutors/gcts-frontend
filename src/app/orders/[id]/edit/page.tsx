@@ -58,7 +58,7 @@ function EditOrderPage({ params }: EditOrderPageProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const { data: order, isLoading: orderLoading } = useGetOrderQuery(parseInt(params.id));
+  const { data: order, isLoading: orderLoading } = useGetOrderQuery(params.id);
   const { data: subjects } = useGetSubjectsQuery();
   const [updateOrder] = useUpdateOrderMutation();
 
@@ -92,7 +92,7 @@ function EditOrderPage({ params }: EditOrderPageProps) {
 
     try {
       await updateOrder({
-        id: parseInt(params.id),
+        id: params.id,
         data: {
           title: formData.title,
           description: formData.description,

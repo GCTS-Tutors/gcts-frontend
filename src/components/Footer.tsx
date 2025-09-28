@@ -26,7 +26,8 @@ export function Footer() {
     <Box
       component="footer"
       sx={{
-        backgroundColor: SiteData.site_colours.accent_colour,
+        //backgroundColor: SiteData.site_colours.accent_colour,
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         color: 'white',
         py: 4,
         mt: 'auto',

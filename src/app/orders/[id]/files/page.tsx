@@ -45,8 +45,8 @@ function OrderFilesPage({ params }: OrderFilesPageProps) {
   const [uploadDialog, setUploadDialog] = useState(false);
   const [error, setError] = useState('');
 
-  const { data: order, isLoading: orderLoading } = useGetOrderQuery(parseInt(params.id));
-  const { data: files = [], isLoading: filesLoading, refetch } = useGetOrderAttachmentsQuery(parseInt(params.id));
+  const { data: order, isLoading: orderLoading } = useGetOrderQuery(params.id);
+  const { data: files = [], isLoading: filesLoading, refetch } = useGetOrderAttachmentsQuery(params.id);
   const [downloadFile] = useDownloadFileMutation();
   const [deleteFile] = useDeleteFileMutation();
 
@@ -271,7 +271,7 @@ function OrderFilesPage({ params }: OrderFilesPageProps) {
         </DialogTitle>
         <DialogContent>
           <FileUploadZone
-            orderId={parseInt(params.id)}
+            orderId={params.id}
             onUploadSuccess={handleUploadSuccess}
             onUploadError={handleUploadError}
             maxFiles={10}

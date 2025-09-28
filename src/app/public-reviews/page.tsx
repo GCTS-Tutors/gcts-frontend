@@ -14,96 +14,90 @@ import {
   CircularProgress,
   Breadcrumbs,
   Paper,
-  Chip
+  Rating
 } from '@mui/material';
 import {
   FilterList,
+  Star,
   Home,
-  Description,
-  School,
-  MenuBook
+  RateReview
 } from '@mui/icons-material';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { PaperCard } from '@/components/PaperCard';
-import PaperCardSkeleton from '@/components/PaperCardSkeleton';
-import { papersApi, SamplePaper } from '@/services/papersApi';
+import { APIClient, Review, ReviewsResponse } from '@/lib/api';
+import { ReviewCard } from '@/components/ReviewCard';
 
-export default function PapersPage() {
-  const [papers, setPapers] = useState<SamplePaper[]>([]);
+export default function PublicReviewsPage() {
+  const [reviews, setReviews] = useState<ReviewsResponse>({
+    reviews: [],
+    total_count: 0,
+    source: 'fallback'
+  });
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [subjectFilter, setSubjectFilter] = useState('all');
-  const [typeFilter, setTypeFilter] = useState('all');
-  const [levelFilter, setLevelFilter] = useState('all');
-  const [totalPapers, setTotalPapers] = useState(0);
-  const [allPapers, setAllPapers] = useState<SamplePaper[]>([]);
-  const papersPerPage = 9;
+  const [ratingFilter, setRatingFilter] = useState('all');
+  const reviewsPerPage = 12;
 
-  // Extract unique values for filters from all papers
-  const subjects = ['all', ...Array.from(new Set(allPapers.map(p => p.subject)))].sort();
-  const types = ['all', ...Array.from(new Set(allPapers.map(p => p.type)))].sort();
-  const levels = ['all', ...Array.from(new Set(allPapers.map(p => p.level)))].sort();
+  // Extract unique subjects from reviews
+  const [subjects, setSubjects] = useState<string[]>(['all']);
 
-  // Fetch all papers once to get filter options
-  useEffect(() => {
-    const fetchAllPapers = async () => {
-      try {
-        const response = await papersApi.getPapers({ page_size: 100 });
-        setAllPapers(response.papers);
-      } catch (error) {
-        console.error('Failed to fetch all papers:', error);
-      }
-    };
-
-    fetchAllPapers();
-  }, []);
+  const ratingOptions = [
+    { value: 'all', label: 'All Ratings' },
+    { value: '5', label: '5 Stars' },
+    { value: '4', label: '4+ Stars' },
+    { value: '3', label: '3+ Stars' }
+  ];
 
   useEffect(() => {
-    const fetchPapers = async () => {
+    const fetchReviews = async () => {
       setLoading(true);
       try {
-        const params: any = {
-          page,
-          page_size: papersPerPage,
-        };
+        const reviewsData = await APIClient.getReviews();
+        setReviews(reviewsData);
 
-        if (subjectFilter !== 'all') {
-          params.subject = subjectFilter;
-        }
-        if (typeFilter !== 'all') {
-          params.type = typeFilter;
-        }
-        if (levelFilter !== 'all') {
-          params.level = levelFilter;
-        }
-
-        const response = await papersApi.getPapers(params);
-        setPapers(response.papers);
-        setTotalPapers(response.total);
+        // Extract unique subjects
+        const uniqueSubjects = ['all', ...Array.from(new Set(
+          reviewsData.reviews.map(review => review.subject.toLowerCase())
+        ))];
+        setSubjects(uniqueSubjects);
       } catch (error) {
-        console.error('Failed to fetch papers:', error);
+        console.warn('Failed to fetch reviews:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPapers();
-  }, [page, subjectFilter, typeFilter, levelFilter]);
+    fetchReviews();
+  }, []);
 
-  // Calculate total pages from API response
-  const totalPages = Math.ceil(totalPapers / papersPerPage);
+  // Filter reviews based on subject and rating
+  const filteredReviews = reviews.reviews.filter(review => {
+    const subjectMatch = subjectFilter === 'all' ||
+      review.subject.toLowerCase() === subjectFilter;
+
+    const ratingMatch = ratingFilter === 'all' ||
+      (ratingFilter === '5' && review.rating === 5) ||
+      (ratingFilter === '4' && review.rating >= 4) ||
+      (ratingFilter === '3' && review.rating >= 3);
+
+    return subjectMatch && ratingMatch;
+  });
+
+  // Paginate filtered reviews
+  const totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
+  const startIndex = (page - 1) * reviewsPerPage;
+  const paginatedReviews = filteredReviews.slice(startIndex, startIndex + reviewsPerPage);
 
   const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
     setPage(value);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const clearFilters = () => {
-    setSubjectFilter('all');
-    setTypeFilter('all');
-    setLevelFilter('all');
-    setPage(1);
+  const getAverageRating = () => {
+    if (filteredReviews.length === 0) return 0;
+    const sum = filteredReviews.reduce((acc, review) => acc + review.rating, 0);
+    return (sum / filteredReviews.length).toFixed(1);
   };
 
   return (
@@ -117,18 +111,18 @@ export default function PapersPage() {
           </Box>
         </Link>
         <Typography color="text.primary" sx={{ display: 'flex', alignItems: 'center' }}>
-          <Description sx={{ mr: 0.5, fontSize: 20 }} />
-          Sample Papers
+          <RateReview sx={{ mr: 0.5, fontSize: 20 }} />
+          Student Reviews
         </Typography>
       </Breadcrumbs>
 
       {/* Header */}
       <Box sx={{ textAlign: 'center', mb: 6 }}>
         <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
-          Sample Academic Papers
+          What Our Students Say
         </Typography>
         <Typography variant="h6" color="text.secondary" sx={{ mb: 3, maxWidth: 800, mx: 'auto' }}>
-          Browse our collection of high-quality academic papers to see the standard of excellence we deliver across all subjects and academic levels
+          Real feedback from students who have achieved academic success with our professional services
         </Typography>
 
         {!loading && (
@@ -144,12 +138,12 @@ export default function PapersPage() {
                 borderRadius: 2
               }}
             >
-              <MenuBook color="primary" />
+              <RateReview color="primary" />
               <Typography variant="h6" color="primary" sx={{ fontWeight: 'bold' }}>
-                {totalPapers}
+                {filteredReviews.length}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Papers Available
+                Reviews
               </Typography>
             </Paper>
 
@@ -164,13 +158,16 @@ export default function PapersPage() {
                 borderRadius: 2
               }}
             >
-              <School color="primary" />
+              <Star color="primary" />
               <Typography variant="h6" color="primary" sx={{ fontWeight: 'bold' }}>
-                {new Set(papers.map(p => p.subject)).size}
+                {getAverageRating()}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Subjects Covered
-              </Typography>
+              <Rating
+                value={parseFloat(getAverageRating())}
+                readOnly
+                precision={0.1}
+                size="small"
+              />
             </Paper>
           </Box>
         )}
@@ -184,10 +181,10 @@ export default function PapersPage() {
           sx={{ display: 'flex', alignItems: 'center', mb: 3 }}
         >
           <FilterList sx={{ mr: 1 }} />
-          Filter Papers
+          Filter Reviews
         </Typography>
         <Grid container spacing={3}>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={4}>
             <FormControl fullWidth>
               <InputLabel>Subject</InputLabel>
               <Select
@@ -200,55 +197,40 @@ export default function PapersPage() {
               >
                 {subjects.map(subject => (
                   <MenuItem key={subject} value={subject}>
-                    {subject === 'all' ? 'All Subjects' : subject}
+                    {subject === 'all' ? 'All Subjects' : subject.charAt(0).toUpperCase() + subject.slice(1)}
                   </MenuItem>
                 ))}
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={4}>
             <FormControl fullWidth>
-              <InputLabel>Type</InputLabel>
+              <InputLabel>Rating</InputLabel>
               <Select
-                value={typeFilter}
-                label="Type"
+                value={ratingFilter}
+                label="Rating"
                 onChange={(e) => {
-                  setTypeFilter(e.target.value);
+                  setRatingFilter(e.target.value);
                   setPage(1);
                 }}
               >
-                {types.map(type => (
-                  <MenuItem key={type} value={type}>
-                    {type === 'all' ? 'All Types' : type}
+                {ratingOptions.map(option => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
                   </MenuItem>
                 ))}
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <FormControl fullWidth>
-              <InputLabel>Academic Level</InputLabel>
-              <Select
-                value={levelFilter}
-                label="Academic Level"
-                onChange={(e) => {
-                  setLevelFilter(e.target.value);
-                  setPage(1);
-                }}
-              >
-                {levels.map(level => (
-                  <MenuItem key={level} value={level}>
-                    {level === 'all' ? 'All Levels' : level}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={4}>
             <Button
               fullWidth
               variant="outlined"
-              onClick={clearFilters}
+              onClick={() => {
+                setSubjectFilter('all');
+                setRatingFilter('all');
+                setPage(1);
+              }}
               sx={{
                 height: 56, // Match FormControl height
                 borderRadius: 1
@@ -260,30 +242,26 @@ export default function PapersPage() {
         </Grid>
 
         <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-          Showing {papers.length} of {totalPapers} papers
+          Showing {paginatedReviews.length} of {filteredReviews.length} reviews
         </Typography>
       </Paper>
 
-      {/* Loading State with Skeletons */}
+      {/* Loading State */}
       {loading && (
-        <Grid container spacing={3}>
-          {Array.from({ length: papersPerPage }).map((_, index) => (
-            <Grid item xs={12} md={6} lg={4} key={index}>
-              <PaperCardSkeleton />
-            </Grid>
-          ))}
-        </Grid>
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+          <CircularProgress size={60} />
+        </Box>
       )}
 
-      {/* Papers Grid */}
+      {/* Reviews Grid */}
       {!loading && (
         <>
-          {papers.length > 0 ? (
+          {paginatedReviews.length > 0 ? (
             <>
               <Grid container spacing={3}>
-                {papers.map((paper) => (
-                  <Grid item xs={12} md={6} lg={4} key={paper.id}>
-                    <PaperCard paper={paper} excerptLines={4} />
+                {paginatedReviews.map((review) => (
+                  <Grid item xs={12} md={6} lg={4} key={review.id}>
+                    <ReviewCard review={review} />
                   </Grid>
                 ))}
               </Grid>
@@ -308,16 +286,20 @@ export default function PapersPage() {
             </>
           ) : (
             <Paper elevation={1} sx={{ textAlign: 'center', py: 8, borderRadius: 3 }}>
-              <Description sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
+              <RateReview sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
               <Typography variant="h6" gutterBottom>
-                No papers found
+                No reviews found
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                No papers match your selected filters. Try adjusting your criteria.
+                No reviews match your selected filters. Try adjusting your criteria.
               </Typography>
               <Button
                 variant="outlined"
-                onClick={clearFilters}
+                onClick={() => {
+                  setSubjectFilter('all');
+                  setRatingFilter('all');
+                  setPage(1);
+                }}
               >
                 Clear All Filters
               </Button>
@@ -338,10 +320,10 @@ export default function PapersPage() {
         }}
       >
         <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold' }}>
-          Need a Custom Paper Written?
+          Ready to Join Our Successful Students?
         </Typography>
         <Typography variant="h6" sx={{ mb: 4, opacity: 0.9 }}>
-          Get the same quality and professionalism for your specific requirements
+          Experience the same quality and success that these students have achieved
         </Typography>
         <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
           <Button
@@ -361,13 +343,13 @@ export default function PapersPage() {
               }
             }}
           >
-            Order Your Paper Now
+            Place Your Order Now
           </Button>
           <Button
             variant="outlined"
             size="large"
             component={Link}
-            href="/services"
+            href="/contact"
             sx={{
               borderColor: 'white',
               color: 'white',
@@ -380,7 +362,7 @@ export default function PapersPage() {
               }
             }}
           >
-            View Our Services
+            Contact Us
           </Button>
         </Box>
       </Box>

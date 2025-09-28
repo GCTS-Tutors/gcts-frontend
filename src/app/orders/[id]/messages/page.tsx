@@ -33,8 +33,8 @@ interface OrderMessagesPageProps {
 function OrderMessagesPage({ params }: OrderMessagesPageProps) {
   const { user } = useAuth();
 
-  const { data: order, isLoading: orderLoading } = useGetOrderQuery(parseInt(params.id));
-  const { data: messages, isLoading: messagesLoading, error: messagesError, refetch } = useGetOrderMessagesQuery(parseInt(params.id));
+  const { data: order, isLoading: orderLoading } = useGetOrderQuery(params.id);
+  const { data: messages, isLoading: messagesLoading, error: messagesError, refetch } = useGetOrderMessagesQuery(params.id);
   const [createMessage, { isLoading: sendingMessage }] = useCreateMessageMutation();
   const [deleteMessage] = useDeleteMessageMutation();
 
@@ -50,7 +50,7 @@ function OrderMessagesPage({ params }: OrderMessagesPageProps) {
     try {
       await createMessage({
         content,
-        orderId: parseInt(params.id),
+        orderId: params.id,
       }).unwrap();
     } catch (error) {
       console.error('Failed to send message:', error);

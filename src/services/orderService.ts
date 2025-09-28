@@ -302,12 +302,14 @@ export class OrderService {
     completed: number;
     cancelled: number;
   }> {
-    return APIClient.get<{
-      total: number;
-      pending: number;
-      in_progress: number;
-      completed: number;
-      cancelled: number;
-    }>('/orders/stats/');
+    const response = await APIClient.get<any>('/dashboard/');
+    // Transform dashboard response to expected format
+    return {
+      total: response.totalOrders || response.myOrdersCount || 0,
+      pending: response.pendingOrders || 0,
+      in_progress: response.activeOrders || response.inProgressOrders || 0,
+      completed: response.completedOrders || 0,
+      cancelled: response.cancelledOrders || 0,
+    };
   }
 }

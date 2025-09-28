@@ -40,12 +40,16 @@ export default function LoginPage() {
   }, [isAuthenticated, router]);
 
   const handleSubmit = async (values: Record<string, any>) => {
+    // Clear any previous errors
+    clearError();
+
     try {
       await login({ email: values.email, password: values.password });
       // Redirect will happen automatically via useEffect
-    } catch (err) {
-      // Re-throw error to be handled by ValidatedForm
-      throw err;
+    } catch (err: any) {
+      // Don't re-throw - let AuthContext handle the error display
+      // ValidatedForm will still set isSubmitting to false in finally block
+      console.error('Login failed:', err);
     }
   };
 
@@ -81,6 +85,12 @@ export default function LoginPage() {
               Welcome back to GCTS
             </Typography>
           </Box>
+
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }} onClose={clearError}>
+              {error}
+            </Alert>
+          )}
 
           <ValidatedForm
             initialValues={{ email: '', password: '' }}

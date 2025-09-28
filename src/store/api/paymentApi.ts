@@ -108,8 +108,20 @@ export const paymentApi = baseApi.injectEndpoints({
       revenueThisMonth: number;
       monthlyStats: { month: string; revenue: number; count: number }[];
     }, { period?: string }>({
-      query: ({ period = '12m' } = {}) => `/payments/stats/?period=${period}`,
+      query: ({ period = '12m' } = {}) => '/dashboard/',
       providesTags: ['Payment'],
+      transformResponse: (response: any) => {
+        // Transform dashboard response to expected payment stats format
+        return {
+          totalRevenue: response.totalRevenue || 0,
+          totalPayments: response.totalOrders || 0, // Approximate
+          successfulPayments: response.completedOrders || 0,
+          failedPayments: 0, // Not available in dashboard
+          refundedAmount: 0, // Not available in dashboard
+          revenueThisMonth: response.totalRevenue || 0, // Approximate
+          monthlyStats: [], // Not available in dashboard
+        };
+      },
     }),
 
     createPaymentIntent: builder.mutation<PaymentIntent, CreatePaymentRequest>({

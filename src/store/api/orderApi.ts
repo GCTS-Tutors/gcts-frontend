@@ -325,7 +325,7 @@ export const orderApi = baseApi.injectEndpoints({
       ],
     }),
 
-    // Order analytics
+    // Order analytics - using dashboard endpoint
     getMyOrderStats: builder.query<{
       total: number;
       pending: number;
@@ -335,8 +335,20 @@ export const orderApi = baseApi.injectEndpoints({
       totalEarnings?: number;
       averageRating?: number;
     }, void>({
-      query: () => '/orders/my-stats/',
+      query: () => '/dashboard/',
       providesTags: ['DashboardStats'],
+      transformResponse: (response: any) => {
+        // Transform dashboard response to expected format
+        return {
+          total: response.totalOrders || response.myOrdersCount || 0,
+          pending: response.pendingOrders || 0,
+          inProgress: response.activeOrders || response.inProgressOrders || 0,
+          completed: response.completedOrders || 0,
+          cancelled: response.cancelledOrders || 0,
+          totalEarnings: response.totalEarnings || response.totalRevenue,
+          averageRating: response.averageRating,
+        };
+      },
     }),
 
     getOrderAnalytics: builder.query<

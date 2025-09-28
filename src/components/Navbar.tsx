@@ -23,7 +23,7 @@ import {
   Logout,
   Menu as MenuIcon,
   Person,
-  Search,
+  RateReview,
 } from '@mui/icons-material';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -31,7 +31,6 @@ import { SiteData } from '@/lib/siteData';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRoleAccess } from '@/components/auth/RoleGuard';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
-import { GlobalSearch } from '@/components/search/GlobalSearch';
 
 export function Navbar() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -60,8 +59,8 @@ export function Navbar() {
   const menuItems: MenuItem[] = [
     { label: 'Home', href: '/', icon: <Home /> },
     { label: 'Papers', href: '/papers', icon: <Article /> },
+    { label: 'Reviews', href: '/public-reviews', icon: <RateReview /> },
     ...(isAuthenticated ? [{ label: 'Orders', href: '/orders', icon: <Assignment /> }] : []),
-    ...(isAuthenticated ? [{ label: 'Search', href: '/search', icon: <Search /> }] : []),
   ];
 
   const handleLogout = async () => {
@@ -138,16 +137,6 @@ export function Navbar() {
                   </Button>
                 ))}
                 
-                {/* Global Search - only show when authenticated */}
-                {isAuthenticated && (
-                  <Box sx={{ width: 300, ml: 2 }}>
-                    <GlobalSearch
-                      placeholder="Search orders, users, payments..."
-                      variant="outlined"
-                      size="small"
-                    />
-                  </Box>
-                )}
               </Box>
 
               <Box sx={{ display: 'flex', alignItems: 'center' }}>

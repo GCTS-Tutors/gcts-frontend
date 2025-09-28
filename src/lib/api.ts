@@ -18,6 +18,33 @@ export interface APIResponse<T = any> {
   status: number;
 }
 
+export interface SiteStats {
+  happy_students: string;
+  papers_delivered: string;
+  expert_writers: string;
+  success_rate: string;
+  source: 'database' | 'fallback';
+  error?: string;
+}
+
+export interface Review {
+  id: string;
+  rating: number;
+  review: string;
+  subject: string;
+  order_type: string;
+  service: string;
+  created_at: string;
+  month_year: string;
+}
+
+export interface ReviewsResponse {
+  reviews: Review[];
+  total_count: number;
+  source: 'database' | 'fallback';
+  error?: string;
+}
+
 // Token management utilities
 class TokenManager {
   private static ACCESS_TOKEN_KEY = 'gcts_access_token';
@@ -215,15 +242,20 @@ api.interceptors.response.use(
 
             // Handle DRF validation errors nested in details
             if (backendError.details && typeof backendError.details === 'object') {
-              // Look for field validation errors in details
-              const fieldErrors = Object.keys(backendError.details).find(key =>
-                Array.isArray(backendError.details[key]) &&
-                typeof backendError.details[key][0] === 'string'
-              );
+              // Handle non_field_errors specifically
+              if (backendError.details.non_field_errors && Array.isArray(backendError.details.non_field_errors)) {
+                apiError.message = backendError.details.non_field_errors[0];
+              } else {
+                // Look for other field validation errors in details
+                const fieldErrors = Object.keys(backendError.details).find(key =>
+                  Array.isArray(backendError.details[key]) &&
+                  typeof backendError.details[key][0] === 'string'
+                );
 
-              if (fieldErrors) {
-                apiError.field = fieldErrors;
-                apiError.message = backendError.details[fieldErrors][0];
+                if (fieldErrors) {
+                  apiError.field = fieldErrors;
+                  apiError.message = backendError.details[fieldErrors][0];
+                }
               }
             }
           }
@@ -295,10 +327,48 @@ export class APIClient {
     return response.data;
   }
 
+  // Get site statistics
+  static async getStats(): Promise<SiteStats> {
+    try {
+      // Use the public endpoint, no authentication required
+      const response = await api.get<SiteStats>('/public/stats/');
+      return response.data;
+    } catch (error) {
+      // Return fallback values if API fails
+      console.warn('Failed to fetch stats from API, using fallback values:', error);
+      return {
+        happy_students: '10,000+',
+        papers_delivered: '25,000+',
+        expert_writers: '500+',
+        success_rate: '98%',
+        source: 'fallback',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  }
+
+  // Get public reviews
+  static async getReviews(): Promise<ReviewsResponse> {
+    try {
+      // Use the public endpoint, no authentication required
+      const response = await api.get<ReviewsResponse>('/public/reviews/');
+      return response.data;
+    } catch (error) {
+      // Return empty reviews if API fails
+      console.warn('Failed to fetch reviews from API, using fallback values:', error);
+      return {
+        reviews: [],
+        total_count: 0,
+        source: 'fallback',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  }
+
   // File upload helper
   static async uploadFile<T = any>(
-    url: string, 
-    file: File, 
+    url: string,
+    file: File,
     onProgress?: (progress: number) => void
   ): Promise<T> {
     const formData = new FormData();

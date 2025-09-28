@@ -26,6 +26,7 @@ import {
   Analytics,
   Notifications,
   CloudDownload,
+  Article,
 } from '@mui/icons-material';
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -33,6 +34,7 @@ import { PrivateRoute } from '@/components/auth/PrivateRoute';
 import { AdminOverviewTab } from '@/components/dashboard/AdminOverviewTab';
 import { UserManagementTab } from '@/components/dashboard/UserManagementTab';
 import { OrderManagementTab } from '@/components/dashboard/OrderManagementTab';
+import { PapersManagementTab } from '@/components/dashboard/PapersManagementTab';
 import { SystemAnalyticsTab } from '@/components/dashboard/SystemAnalyticsTab';
 import { SystemSettingsTab } from '@/components/dashboard/SystemSettingsTab';
 import { useGetDashboardStatsQuery } from '@/store/api/adminApi';
@@ -249,19 +251,24 @@ function AdminDashboard() {
             icon={<People />} 
             iconPosition="start"
           />
-          <Tab 
-            label="Orders" 
-            icon={<Assignment />} 
+          <Tab
+            label="Orders"
+            icon={<Assignment />}
             iconPosition="start"
           />
-          <Tab 
-            label="Analytics" 
-            icon={<Analytics />} 
+          <Tab
+            label="Papers"
+            icon={<Article />}
             iconPosition="start"
           />
-          <Tab 
-            label="Settings" 
-            icon={<Settings />} 
+          <Tab
+            label="Analytics"
+            icon={<Analytics />}
+            iconPosition="start"
+          />
+          <Tab
+            label="Settings"
+            icon={<Settings />}
             iconPosition="start"
           />
         </Tabs>
@@ -281,10 +288,14 @@ function AdminDashboard() {
       </TabPanel>
 
       <TabPanel value={tabValue} index={3}>
-        <SystemAnalyticsTab />
+        <PapersManagementTab />
       </TabPanel>
 
       <TabPanel value={tabValue} index={4}>
+        <SystemAnalyticsTab />
+      </TabPanel>
+
+      <TabPanel value={tabValue} index={5}>
         <SystemSettingsTab />
       </TabPanel>
 

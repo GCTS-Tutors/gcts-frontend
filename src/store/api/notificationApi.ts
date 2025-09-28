@@ -375,7 +375,20 @@ export const notificationApi = baseApi.injectEndpoints({
         clicked: number;
       }>;
     }, { period?: '7d' | '30d' | '90d' }>({
-      query: ({ period = '30d' }) => `/notifications/stats/?period=${period}`,
+      query: ({ period = '30d' }) => '/dashboard/',
+      transformResponse: (response: any) => {
+        // Return placeholder data since notification stats aren't in dashboard
+        return {
+          totalSent: 0,
+          emailsSent: 0,
+          pushNotificationsSent: 0,
+          smsSent: 0,
+          deliveryRate: 0,
+          openRate: 0,
+          clickRate: 0,
+          statsByType: {},
+        };
+      },
       providesTags: ['DashboardStats'],
     }),
 

@@ -42,8 +42,8 @@ function OrderReviewPage({ params }: OrderReviewPageProps) {
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [error, setError] = useState('');
 
-  const { data: order, isLoading: orderLoading } = useGetOrderQuery(parseInt(params.id));
-  const { data: existingReview, isLoading: reviewLoading, refetch } = useGetOrderReviewQuery(parseInt(params.id));
+  const { data: order, isLoading: orderLoading } = useGetOrderQuery(params.id);
+  const { data: existingReview, isLoading: reviewLoading, refetch } = useGetOrderReviewQuery(params.id);
   const [createReview, { isLoading: creating }] = useCreateReviewMutation();
   const [updateReview, { isLoading: updating }] = useUpdateReviewMutation();
   const [deleteReview, { isLoading: deleting }] = useDeleteReviewMutation();
@@ -78,7 +78,7 @@ function OrderReviewPage({ params }: OrderReviewPageProps) {
       } else {
         await createReview({
           ...data,
-          orderId: parseInt(params.id),
+          orderId: params.id,
         }).unwrap();
       }
       

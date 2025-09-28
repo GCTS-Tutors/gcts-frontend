@@ -8,6 +8,7 @@ export * from './fileApi';
 export * from './analyticsApi';
 export * from './notificationApi';
 export * from './adminApi';
+export * from './papersApi';
 export * from './searchApi';
 
 // Export commonly used types

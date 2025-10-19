@@ -13,7 +13,7 @@ export interface FileAttachment {
     role: string;
   };
   order: {
-    id: number;
+    id: string;
     title: string;
   };
   fileType: 'requirement' | 'submission' | 'revision' | 'reference';
@@ -23,14 +23,14 @@ export interface FileAttachment {
 }
 
 export interface UploadFileRequest {
-  orderId: number;
+  orderId: string;
   file: File;
   fileType: 'requirement' | 'submission' | 'revision' | 'reference';
   isPublic?: boolean;
 }
 
 export interface FileFilters {
-  orderId?: number;
+  orderId?: string;
   fileType?: string;
   uploadedBy?: number;
   mimeType?: string;
@@ -40,7 +40,7 @@ export interface FileFilters {
 
 export const fileApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getOrderAttachments: builder.query<FileAttachment[], number>({
+    getOrderAttachments: builder.query<FileAttachment[], string>({
       query: (orderId) => `/orders/${orderId}/files/`,
       providesTags: (result, error, orderId) => [
         { type: 'OrderFile', id: `ORDER_${orderId}` },

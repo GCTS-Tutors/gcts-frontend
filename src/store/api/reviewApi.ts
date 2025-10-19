@@ -19,7 +19,7 @@ export interface Review {
     totalReviews?: number;
   };
   order: {
-    id: number;
+    id: string;
     title: string;
     status: string;
   };
@@ -31,7 +31,7 @@ export interface Review {
 export interface CreateReviewRequest {
   rating: number;
   comment: string;
-  orderId: number;
+  orderId: string;
   isPublic?: boolean;
 }
 
@@ -65,7 +65,7 @@ export const reviewApi = baseApi.injectEndpoints({
       providesTags: ['Review'],
     }),
     
-    getOrderReview: builder.query<Review, number>({
+    getOrderReview: builder.query<Review, string>({
       query: (orderId) => `/orders/${orderId}/review/`,
       providesTags: (result, error, orderId) => [
         { type: 'Review', id: `ORDER_${orderId}` },

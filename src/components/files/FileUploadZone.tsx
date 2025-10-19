@@ -30,7 +30,7 @@ import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 
 interface FileUploadZoneProps {
-  orderId: number;
+  orderId: string;
   onUploadSuccess?: (files: any[]) => void;
   onUploadError?: (error: string) => void;
   maxFiles?: number;

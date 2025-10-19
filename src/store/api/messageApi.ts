@@ -11,7 +11,7 @@ export interface Message {
     role: string;
   };
   order: {
-    id: number;
+    id: string;
     title: string;
   };
   isRead: boolean;
@@ -21,12 +21,12 @@ export interface Message {
 
 export interface CreateMessageRequest {
   content: string;
-  orderId: number;
+  orderId: string;
 }
 
 export const messageApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getOrderMessages: builder.query<Message[], number>({
+    getOrderMessages: builder.query<Message[], string>({
       query: (orderId) => `/orders/${orderId}/messages/`,
       providesTags: (result, error, orderId) => [
         { type: 'Message', id: 'ORDER_MESSAGES' },

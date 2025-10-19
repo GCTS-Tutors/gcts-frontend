@@ -35,7 +35,7 @@ export interface PaymentIntent {
 }
 
 export interface CreatePaymentRequest {
-  orderId: number;
+  orderId: string;
   paymentMethod: 'card' | 'paypal' | 'bank_transfer';
   amount: number;
   currency?: string;

@@ -1,0 +1,46 @@
+name: Deploy Frontend to EC2
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            # Navigate to frontend directory
+            cd /home/ubuntu/gcts/frontend
+
+            # Pull latest changes
+            git fetch origin
+            git pull origin develop
+
+            # Run deployment script
+            chmod +x deployment/deploy-frontend.sh
+            ./deployment/deploy-frontend.sh deploy
+
+            # Check deployment status
+            pm2 list
+            pm2 logs gcts-frontend --lines 20 --nostream
+
+      - name: Notify on success
+        if: success()
+        run: echo "Frontend deployment completed successfully!"
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "Frontend deployment failed!"
+          exit 1

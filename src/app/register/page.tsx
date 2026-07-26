@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Container,
   Paper,
@@ -28,11 +29,12 @@ import {
   Person,
 } from '@mui/icons-material';
 import Link from 'next/link';
-import { ValidatedForm, FormField } from '@/components/forms/ValidatedForm';
-import { registerSchema } from '@/utils/validation';
-import { useRegisterMutation } from '@/store/api/authApi';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function RegisterPage() {
+  const router = useRouter();
+  const { register, isAuthenticated } = useAuth();
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -45,6 +47,13 @@ export default function RegisterPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  // Redirect once authenticated (mirrors the login page behaviour).
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push('/dashboard');
+    }
+  }, [isAuthenticated, router]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = event.target;
@@ -73,16 +82,16 @@ export default function RegisterPage() {
     }
 
     try {
-      // TODO: Implement actual registration logic
-      console.log('Registration attempt:', formData);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // For now, just show success
-      alert('Registration functionality will be implemented in the API integration phase');
-    } catch (err) {
-      setError('Registration failed. Please try again.');
+      await register({
+        email: formData.email,
+        password: formData.password,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        role: 'student',
+      });
+      // On success the user is logged in; redirect happens via useEffect above.
+    } catch (err: any) {
+      setError(err?.message || 'Registration failed. Please try again.');
     } finally {
       setIsLoading(false);
     }

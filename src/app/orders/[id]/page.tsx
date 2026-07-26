@@ -146,18 +146,18 @@ function OrderDetailsPage({ params }: OrderDetailsPageProps) {
 
   const canEdit = () => {
     if (user?.role === 'admin') return true;
-    if (user?.role === 'student' && order?.user === user.id && order?.status === 'pending') return true;
+    if (user?.role === 'student' && order?.user?.id === user.id && order?.status === 'pending') return true;
     return false;
   };
 
   const canDelete = () => {
     if (user?.role === 'admin') return true;
-    if (user?.role === 'student' && order?.user === user.id && order?.status === 'pending') return true;
+    if (user?.role === 'student' && order?.user?.id === user.id && order?.status === 'pending') return true;
     return false;
   };
 
   const canUpdateStatus = () => {
-    return user?.role === 'admin' || (user?.role === 'writer' && order?.assigned_to === user.id);
+    return user?.role === 'admin' || (user?.role === 'writer' && order?.assigned_to?.id === user.id);
   };
 
   const getOrderSteps = () => {
@@ -302,7 +302,7 @@ function OrderDetailsPage({ params }: OrderDetailsPageProps) {
                       </ListItemIcon>
                       <ListItemText
                         primary="Subject"
-                        secondary={order.subject || 'General'}
+                        secondary={order.subject?.name || 'General'}
                       />
                     </ListItem>
                   </List>
@@ -384,7 +384,7 @@ function OrderDetailsPage({ params }: OrderDetailsPageProps) {
                   </ListItemIcon>
                   <ListItemText
                     primary="Order created"
-                    secondary={format(new Date(order.created_at), 'PPP p')}
+                    secondary={order.created_at ? format(new Date(order.created_at), 'PPP p') : 'N/A'}
                   />
                 </ListItem>
               </List>
@@ -407,7 +407,7 @@ function OrderDetailsPage({ params }: OrderDetailsPageProps) {
                   </Avatar>
                   <Box>
                     <Typography variant="subtitle1">
-                      {order.user.first_name} {order.user.last_name}
+                      {order.user.firstName} {order.user.lastName}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       Student ID: {order.user.id}
@@ -449,7 +449,7 @@ function OrderDetailsPage({ params }: OrderDetailsPageProps) {
                   </Avatar>
                   <Box>
                     <Typography variant="subtitle1">
-                      {order.assigned_to.first_name} {order.assigned_to.last_name}
+                      {order.assigned_to.firstName} {order.assigned_to.lastName}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       Writer ID: {order.assigned_to.id}

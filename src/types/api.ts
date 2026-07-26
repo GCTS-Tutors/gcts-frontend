@@ -91,7 +91,7 @@ export type AcademicLevel = 'high_school' | 'undergraduate' | 'graduate' | 'phd'
 export type CitationStyle = 'APA' | 'MLA' | 'Chicago' | 'Harvard' | 'IEEE' | 'other';
 
 export interface Subject {
-  id: number;
+  id: string;
   name: string;
   description?: string;
   coverImage?: string;
@@ -99,7 +99,7 @@ export interface Subject {
 }
 
 export interface Order {
-  id: number;
+  id: string;
   orderNumber?: string;
   student?: User;
   user?: User; // Backend format
@@ -139,8 +139,8 @@ export interface Order {
 }
 
 export interface OrderFile {
-  id: number;
-  order: number;
+  id: string;
+  order: string;
   file: string;
   fileName: string;
   fileSize: number;
@@ -150,8 +150,8 @@ export interface OrderFile {
 }
 
 export interface OrderComment {
-  id: number;
-  order: number;
+  id: string;
+  order: string;
   user: User;
   message: string;
   createdAt: string;
@@ -159,13 +159,36 @@ export interface OrderComment {
 }
 
 export interface OrderReview {
-  id: number;
-  order: number;
+  id: string;
+  order: string;
   student: User;
   writer: User;
   rating: number;
   comment?: string;
   createdAt: string;
+}
+
+// Review is an alias for OrderReview (same shape)
+export type Review = OrderReview;
+
+// Message between users on an order
+export interface Message {
+  id: string;
+  content: string;
+  sender: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+    role: string;
+  };
+  order: {
+    id: string;
+    title: string;
+  };
+  isRead: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreateOrderRequest {
@@ -190,7 +213,7 @@ export type PaymentStatus = 'pending' | 'completed' | 'failed' | 'cancelled' | '
 export type PaymentMethod = 'card' | 'paypal' | 'bank_transfer';
 
 export interface Payment {
-  id: number;
+  id: string;
   order: Order;
   amount: number;
   currency: string;
@@ -202,7 +225,7 @@ export interface Payment {
 }
 
 export interface PaymentRequest {
-  orderId: number;
+  orderId: string;
   amount: number;
   method: PaymentMethod;
   cardToken?: string;
@@ -220,7 +243,7 @@ export type NotificationType =
   | 'review_received';
 
 export interface Notification {
-  id: number;
+  id: string;
   user: User;
   type: NotificationType;
   title: string;

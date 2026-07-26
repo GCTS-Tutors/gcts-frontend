@@ -95,7 +95,7 @@ export default function PublicReviewsPage() {
   };
 
   const getAverageRating = () => {
-    if (filteredReviews.length === 0) return 0;
+    if (filteredReviews.length === 0) return '0';
     const sum = filteredReviews.reduce((acc, review) => acc + review.rating, 0);
     return (sum / filteredReviews.length).toFixed(1);
   };

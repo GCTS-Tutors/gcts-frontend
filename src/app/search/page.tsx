@@ -255,7 +255,7 @@ function SearchPage() {
           <Grid item xs={12} md={8}>
             <TextField
               fullWidth
-              size="large"
+              size="medium"
               placeholder="Search for anything..."
               value={searchQuery}
               onChange={(e) => handleSearch(e.target.value)}
@@ -303,7 +303,7 @@ function SearchPage() {
           title="Search Filters"
           filters={filterConfig}
           values={filters}
-          onChange={setFilters}
+          onChange={(newFilters) => setFilters((prev) => ({ ...prev, ...newFilters }))}
           onApply={() => {}}
           onReset={() => setFilters({ dateFrom: '', dateTo: '', status: '', userId: 0, limit: 50 })}
           showApplyButton={false}

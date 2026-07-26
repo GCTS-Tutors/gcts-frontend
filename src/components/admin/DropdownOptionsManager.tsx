@@ -37,7 +37,7 @@ import {
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon
 } from '@mui/icons-material';
-import { useAllDropdownOptions } from '../../hooks/useDropdownOptions';
+import { useAllDropdownOptions, type AllDropdownOptions } from '../../hooks/useDropdownOptions';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -82,7 +82,7 @@ const DropdownOptionsManager: React.FC = () => {
 
   const getOptionsForTab = (tabIndex: number) => {
     if (!allOptions) return [];
-    const keys = ['subjects', 'order_types', 'academic_levels', 'citation_styles', 'languages', 'order_statuses', 'urgency_levels'];
+    const keys: (keyof AllDropdownOptions)[] = ['subjects', 'order_types', 'academic_levels', 'citation_styles', 'languages', 'order_statuses', 'urgency_levels'];
     return allOptions[keys[tabIndex]] || [];
   };
 

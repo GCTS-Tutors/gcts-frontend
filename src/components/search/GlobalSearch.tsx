@@ -74,7 +74,7 @@ export function GlobalSearch({
     if (!searchQuery.trim()) return [];
 
     // Mock data - replace with actual API call
-    const mockResults: SearchResult[] = [
+    const allResults: SearchResult[] = [
       {
         id: 1,
         type: 'order',
@@ -104,7 +104,9 @@ export function GlobalSearch({
         status: 'completed',
         createdAt: new Date().toISOString(),
       },
-    ].filter(item => 
+    ];
+
+    const mockResults: SearchResult[] = allResults.filter(item =>
       item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.description?.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -282,7 +284,7 @@ export function GlobalSearch({
         {/* Error State */}
         {error && (
           <Box sx={{ p: 2 }}>
-            <Alert severity="error" size="small">
+            <Alert severity="error">
               {error}
             </Alert>
           </Box>

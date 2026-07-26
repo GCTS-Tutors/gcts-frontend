@@ -95,13 +95,13 @@ function NotificationsPage() {
     setSelectedNotification(null);
   };
 
-  const handleMarkAsRead = async (notificationId: number) => {
+  const handleMarkAsRead = async (notificationId: string) => {
     await markAsRead(notificationId);
     refetch();
     handleMenuClose();
   };
 
-  const handleDelete = async (notificationId: number) => {
+  const handleDelete = async (notificationId: string) => {
     await deleteNotification(notificationId);
     refetch();
     handleMenuClose();

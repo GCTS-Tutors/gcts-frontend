@@ -120,11 +120,11 @@ export default function PaperDetailsPage() {
           </Typography>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, mb: 3, flexWrap: 'wrap' }}>
-            {paper.date && (
+            {paper.created_at && (
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <CalendarToday sx={{ mr: 1, fontSize: 20, color: 'text.secondary' }} />
                 <Typography variant="body2" color="text.secondary">
-                  {new Date(paper.date).toLocaleDateString('en-US', {
+                  {new Date(paper.created_at).toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric'

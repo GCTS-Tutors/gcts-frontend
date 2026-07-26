@@ -41,7 +41,7 @@ export function StudentOrdersOverview({ limit = 5 }: StudentOrdersOverviewProps)
     error 
   } = useGetOrdersQuery({
     page: 1,
-    page_size: limit,
+    pageSize: limit,
     ordering: '-created_at'
   });
 
@@ -157,7 +157,7 @@ export function StudentOrdersOverview({ limit = 5 }: StudentOrdersOverviewProps)
               secondary={
                 <Box>
                   <Typography variant="body2" color="text.secondary">
-                    {order?.subject || 'N/A'} • {order?.min_pages || 0} pages • {order?.deadline ? `Due ${format(new Date(order.deadline), 'MMM dd')}` : 'No deadline'}
+                    {order?.subject?.name || 'N/A'} • {order?.min_pages || 0} pages • {order?.deadline ? `Due ${format(new Date(order.deadline), 'MMM dd')}` : 'No deadline'}
                   </Typography>
                   <LinearProgress
                     variant="determinate"

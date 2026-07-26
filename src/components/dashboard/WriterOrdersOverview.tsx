@@ -189,7 +189,7 @@ export function WriterOrdersOverview({ limit = 5 }: WriterOrdersOverviewProps) {
                   
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 0.5 }}>
                     <Typography variant="caption" color="text.secondary">
-                      Created {formatDistanceToNow(new Date(order.createdAt), { addSuffix: true })}
+                      Created {order.createdAt ? formatDistanceToNow(new Date(order.createdAt), { addSuffix: true }) : 'N/A'}
                     </Typography>
                     <Typography variant="caption" color="primary.main" fontWeight="medium">
                       ${order.price}

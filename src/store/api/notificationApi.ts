@@ -34,13 +34,13 @@ export const notificationApi = baseApi.injectEndpoints({
           : [{ type: 'Notification', id: 'LIST' }],
     }),
 
-    getNotification: builder.query<Notification, number>({
+    getNotification: builder.query<Notification, string>({
       query: (id) => `/notifications/${id}/`,
       providesTags: (result, error, id) => [{ type: 'Notification', id }],
     }),
 
     // Notification status updates
-    markAsRead: builder.mutation<Notification, number>({
+    markAsRead: builder.mutation<Notification, string>({
       query: (id) => ({
         url: `/notifications/${id}/`,
         method: 'PATCH',
@@ -64,7 +64,7 @@ export const notificationApi = baseApi.injectEndpoints({
       },
     }),
 
-    markAsUnread: builder.mutation<Notification, number>({
+    markAsUnread: builder.mutation<Notification, string>({
       query: (id) => ({
         url: `/notifications/${id}/`,
         method: 'PATCH',
@@ -109,7 +109,7 @@ export const notificationApi = baseApi.injectEndpoints({
       },
     }),
 
-    deleteNotification: builder.mutation<void, number>({
+    deleteNotification: builder.mutation<void, string>({
       query: (id) => ({
         url: `/notifications/${id}/`,
         method: 'DELETE',
@@ -141,12 +141,6 @@ export const notificationApi = baseApi.injectEndpoints({
         method: 'DELETE',
       }),
       invalidatesTags: [{ type: 'Notification', id: 'LIST' }],
-    }),
-
-    // Notification counts
-    getUnreadCount: builder.query<{ count: number }, void>({
-      query: () => '/notifications/unread-count/',
-      providesTags: [{ type: 'Notification', id: 'COUNT' }],
     }),
 
     // Notification preferences
@@ -414,9 +408,7 @@ export const {
   useMarkAsUnreadMutation,
   useMarkAllAsReadMutation,
   useDeleteNotificationMutation,
-  useDeleteAllNotificationsMutation,
-  useGetUnreadCountQuery,
-  useGetNotificationPreferencesQuery,
+  useDeleteAllNotificationsMutation,  useGetNotificationPreferencesQuery,
   useUpdateNotificationPreferencesMutation,
   useSendNotificationMutation,
   useSendBulkNotificationMutation,

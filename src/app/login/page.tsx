@@ -23,7 +23,7 @@ import {
 } from '@mui/icons-material';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
-import { ValidatedForm, FormField } from '@/components/forms/ValidatedForm';
+import { ValidatedForm } from '@/components/forms/ValidatedForm';
 import { loginSchema } from '@/utils/validation';
 
 export default function LoginPage() {
@@ -101,66 +101,58 @@ export default function LoginPage() {
           >
             {({ values, errors, touched, handleChange, handleBlur }) => (
               <>
-                <FormField
+                <TextField
+                  fullWidth
                   name="email"
                   label="Email Address"
+                  type="email"
                   required
-                  error={errors.email}
-                  touched={touched.email}
-                >
-                  <TextField
-                    fullWidth
-                    name="email"
-                    type="email"
-                    value={values.email}
-                    onChange={(e) => handleChange('email', e.target.value)}
-                    onBlur={() => handleBlur('email')}
-                    margin="normal"
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <Email />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                </FormField>
+                  value={values.email}
+                  onChange={(e) => handleChange('email', e.target.value)}
+                  onBlur={() => handleBlur('email')}
+                  margin="normal"
+                  error={touched.email && !!errors.email}
+                  helperText={touched.email ? errors.email : undefined}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Email />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
 
-                <FormField
+                <TextField
+                  fullWidth
                   name="password"
                   label="Password"
+                  type={showPassword ? 'text' : 'password'}
                   required
-                  error={errors.password}
-                  touched={touched.password}
-                >
-                  <TextField
-                    fullWidth
-                    name="password"
-                    type={showPassword ? 'text' : 'password'}
-                    value={values.password}
-                    onChange={(e) => handleChange('password', e.target.value)}
-                    onBlur={() => handleBlur('password')}
-                    margin="normal"
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <Lock />
-                        </InputAdornment>
-                      ),
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton
-                            aria-label="toggle password visibility"
-                            onClick={togglePasswordVisibility}
-                            edge="end"
-                          >
-                            {showPassword ? <VisibilityOff /> : <Visibility />}
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                </FormField>
+                  value={values.password}
+                  onChange={(e) => handleChange('password', e.target.value)}
+                  onBlur={() => handleBlur('password')}
+                  margin="normal"
+                  error={touched.password && !!errors.password}
+                  helperText={touched.password ? errors.password : undefined}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Lock />
+                      </InputAdornment>
+                    ),
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle password visibility"
+                          onClick={togglePasswordVisibility}
+                          edge="end"
+                        >
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
 
                 <Box sx={{ textAlign: 'center', mt: 2 }}>
                   <MuiLink

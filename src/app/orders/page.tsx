@@ -73,7 +73,16 @@ function OrdersPage() {
   const [sortBy, setSortBy] = useState('-created_at');
   const [page, setPage] = useState(1);
   const [useAdvancedSearch, setUseAdvancedSearch] = useState(false);
-  const [advancedFilters, setAdvancedFilters] = useState({
+  const [advancedFilters, setAdvancedFilters] = useState<{
+    query: string;
+    status: string[];
+    academicLevel: string[];
+    paperType: string[];
+    dateFrom: string;
+    dateTo: string;
+    sortBy: string;
+    sortOrder: 'asc' | 'desc';
+  }>({
     query: '',
     status: [],
     academicLevel: [],
@@ -124,7 +133,7 @@ function OrdersPage() {
   // Regular query for basic search
   const { data: ordersResponse, isLoading, error, refetch } = useGetOrdersQuery({
     page,
-    page_size: 12,
+    pageSize: 12,
     ordering: sortBy.replace('createdAt', 'created_at').replace('orderType', 'type'),
     filters: getFilters(),
   }, {

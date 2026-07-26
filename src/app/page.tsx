@@ -209,11 +209,11 @@ export default function HomePage() {
                   <Button
                     variant="contained"
                     size="large"
-                    fullWidth={{ xs: true, md: false }} // ✅ stack = full width, desktop = natural width
                     startIcon={<Assignment />}
                     component={Link}
                     href="/order/place"
                     sx={{
+                      width: { xs: '100%', md: 'auto' }, // ✅ stack = full width, desktop = natural width
                       backgroundColor: '#FFD700',
                       color: '#333',
                       fontWeight: 'bold',
@@ -230,11 +230,11 @@ export default function HomePage() {
                   <Button
                     variant="outlined"
                     size="large"
-                    fullWidth={{ xs: true, md: false }} // ✅ same treatment
                     startIcon={<School />}
                     component={Link}
                     href="/papers"
                     sx={{
+                      width: { xs: '100%', md: 'auto' }, // ✅ same treatment
                       borderColor: 'white',
                       color: 'white',
                       px: 4,

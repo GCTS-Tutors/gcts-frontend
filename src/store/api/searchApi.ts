@@ -286,7 +286,7 @@ export const searchApi = baseApi.injectEndpoints({
         url: '/search/export/',
         method: 'POST',
         body: data,
-        responseHandler: async (response) => response.blob(),
+        responseHandler: async (response: Response) => response.blob(),
       }),
     }),
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Box, FormLabel, FormHelperText, Paper } from '@mui/material';
 import dynamic from 'next/dynamic';
 
@@ -34,7 +34,6 @@ export function RichTextEditor({
   disabled = false,
 }: RichTextEditorProps) {
   const [mounted, setMounted] = useState(false);
-  const quillRef = useRef<any>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -153,7 +152,6 @@ export function RichTextEditor({
         }}
       >
         <ReactQuill
-          ref={quillRef}
           value={value}
           onChange={onChange}
           modules={modules}

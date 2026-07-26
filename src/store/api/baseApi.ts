@@ -89,6 +89,13 @@ export const baseApi = createApi({
     'Message',
     'DashboardStats',
     'SystemHealth',
+    'AdminPaper',
+    'SearchResults',
+    'SearchSuggestions',
+    'RecentSearches',
+    'PopularSearches',
+    'SavedSearches',
+    'SearchAnalytics',
   ],
   endpoints: () => ({}),
 });

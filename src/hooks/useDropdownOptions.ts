@@ -12,10 +12,12 @@ interface DropdownOption {
   display_name: string;
   icon?: string;
   is_other?: boolean;
+  is_active?: boolean;
+  order?: number;
   description?: string;
 }
 
-interface AllDropdownOptions {
+export interface AllDropdownOptions {
   subjects: DropdownOption[];
   order_types: DropdownOption[];
   academic_levels: DropdownOption[];

@@ -349,29 +349,29 @@ export const userApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ['User'],
     }),
-  }),
 
-  // Dashboard endpoint
-  getDashboard: builder.query<{
-    user: User;
-    totalOrders: number;
-    activeOrders: number;
-    completedOrders: number;
-    totalSpent?: number;
-    totalRevenue?: number;
-    totalUsers?: number;
-    myOrders?: any[];
-  }, void>({
-    query: () => '/dashboard/',
-    transformResponse: (response: any) => {
-      // Handle the backend response format
-      if (response.success !== undefined) {
+    // Dashboard endpoint
+    getDashboard: builder.query<{
+      user: User;
+      totalOrders: number;
+      activeOrders: number;
+      completedOrders: number;
+      totalSpent?: number;
+      totalRevenue?: number;
+      totalUsers?: number;
+      myOrders?: any[];
+    }, void>({
+      query: () => '/dashboard/',
+      transformResponse: (response: any) => {
+        // Handle the backend response format
+        if (response.success !== undefined) {
+          return response;
+        }
+        // Direct response (legacy format)
         return response;
-      }
-      // Direct response (legacy format)
-      return response;
-    },
-    providesTags: ['DashboardStats'],
+      },
+      providesTags: ['DashboardStats'],
+    }),
   }),
 });
 

@@ -5,7 +5,8 @@ import {
   RegisterRequest,
   PasswordResetRequest,
   PasswordResetConfirm,
-  User
+  User,
+  UserRole
 } from '@/types/api';
 import { transformUser } from '@/utils/dataTransformers';
 
@@ -31,7 +32,21 @@ export class AuthService {
    * Register a new user
    */
   static async register(userData: RegisterRequest): Promise<AuthTokens> {
-    return APIClient.post<AuthTokens>('/auth/register/', userData);
+    // Backend RegisterView expects: email, password, firstName, lastName
+    // and returns { user, access, refresh } (user serialized in camelCase).
+    const response = await APIClient.post<any>('/auth/register/', {
+      email: userData.email,
+      password: userData.password,
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+    });
+
+    // Map backend response to frontend AuthTokens type (mirror login()).
+    return {
+      access: response.access,
+      refresh: response.refresh,
+      user: transformUser(response.user),
+    };
   }
 
   /**

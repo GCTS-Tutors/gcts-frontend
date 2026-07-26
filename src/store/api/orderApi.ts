@@ -212,9 +212,16 @@ export const orderApi = baseApi.injectEndpoints({
       }),
     }),
 
-    // Order comments
+    // Order comments — flat /comments/ resource filtered by ?order= (the
+    // nested /orders/{id}/comments/ routes never existed on the backend).
+    // The backend scopes visibility (owner never sees internal notes).
     getOrderComments: builder.query<OrderComment[], string>({
-      query: (orderId) => `/orders/${orderId}/comments/`,
+      query: (orderId) => `/comments/?order=${orderId}`,
+      transformResponse: (response: any): OrderComment[] => {
+        const payload =
+          response?.success && response?.data !== undefined ? response.data : response;
+        return Array.isArray(payload) ? payload : payload?.results ?? [];
+      },
       providesTags: (result, error, orderId) =>
         result
           ? [
@@ -226,12 +233,12 @@ export const orderApi = baseApi.injectEndpoints({
 
     addOrderComment: builder.mutation<
       OrderComment,
-      { orderId: string; content: string; isPrivate?: boolean }
+      { orderId: string; content: string; isInternal?: boolean }
     >({
-      query: ({ orderId, content, isPrivate = false }) => ({
-        url: `/orders/${orderId}/comments/`,
+      query: ({ orderId, content, isInternal = false }) => ({
+        url: '/comments/',
         method: 'POST',
-        body: { content, is_private: isPrivate },
+        body: { order: orderId, message: content, is_internal: isInternal },
       }),
       invalidatesTags: (result, error, { orderId }) => [
         { type: 'OrderComment', id: orderId },

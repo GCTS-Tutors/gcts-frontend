@@ -74,6 +74,7 @@ import {
   useUploadOrderFileMutation,
 } from '@/store/api/orderApi';
 import { useGetWritersQuery } from '@/store/api/userApi';
+import { OrderComments } from '@/components/orders/OrderComments';
 
 interface OrderDetailsPageProps {
   params: {
@@ -506,7 +507,7 @@ function OrderDetailsPage({ params }: OrderDetailsPageProps) {
                 Order History
               </Typography>
               <Divider sx={{ mb: 2 }} />
-              
+
               <List>
                 <ListItem>
                   <ListItemIcon>
@@ -520,6 +521,9 @@ function OrderDetailsPage({ params }: OrderDetailsPageProps) {
               </List>
             </CardContent>
           </Card>
+
+          {/* Requester ↔ admin communication thread */}
+          <OrderComments orderId={order.id} isAdmin={isAdmin} />
         </Grid>
 
         {/* Sidebar */}

@@ -18,6 +18,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useState, useEffect } from 'react';
 import type { OrderFormData } from '@/app/order/place/page';
+import { useDropdownOptions } from '@/hooks/useDropdownOptions';
 
 interface OrderDetailsStepProps {
   data: OrderFormData;
@@ -81,6 +82,7 @@ const urgencyLevels = [
 ];
 
 export function OrderDetailsStep({ data, errors, onChange }: OrderDetailsStepProps) {
+  const { options: subjectOptions, loading: subjectsLoading } = useDropdownOptions('subjects');
   const [deadline, setDeadline] = useState<Date | null>(
     data.deadline ? new Date(data.deadline) : null
   );
@@ -132,20 +134,27 @@ export function OrderDetailsStep({ data, errors, onChange }: OrderDetailsStepPro
             />
           </Grid>
 
-          {/* Subject */}
+          {/* Subject — driven by the admin-managed dropdown-options API, with
+              the static list as a fallback if the API is unavailable */}
           <Grid item xs={12} md={6}>
-            <FormControl fullWidth error={!!errors.subject}>
+            <FormControl fullWidth error={!!errors.subject} disabled={subjectsLoading}>
               <InputLabel>Subject</InputLabel>
               <Select
                 value={data.subject}
                 label="Subject"
                 onChange={(e) => onChange({ subject: e.target.value })}
               >
-                {subjects.map((subject) => (
-                  <MenuItem key={subject} value={subject}>
-                    {subject}
-                  </MenuItem>
-                ))}
+                {subjectOptions.length > 0
+                  ? subjectOptions.map((option) => (
+                      <MenuItem key={option.id} value={option.name}>
+                        {option.display_name}
+                      </MenuItem>
+                    ))
+                  : subjects.map((subject) => (
+                      <MenuItem key={subject} value={subject}>
+                        {subject}
+                      </MenuItem>
+                    ))}
               </Select>
               {errors.subject && <FormHelperText>{errors.subject}</FormHelperText>}
             </FormControl>

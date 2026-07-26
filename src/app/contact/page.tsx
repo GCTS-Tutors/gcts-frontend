@@ -20,6 +20,7 @@ import {
   Send
 } from '@mui/icons-material';
 import { useState } from 'react';
+import { axiosInstance } from '@/lib/api';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -28,17 +29,39 @@ export default function ContactPage() {
     subject: '',
     message: ''
   });
+  const [submitError, setSubmitError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement actual form submission
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 5000);
+    setSubmitError('');
+    setSubmitting(true);
+    try {
+      // The Inquiry resource stores email + message; fold name/subject into
+      // the message body so the admin gets the full context.
+      await axiosInstance.post('/inquiries/', {
+        email: formData.email,
+        message:
+          `From: ${formData.name || 'Anonymous'}\n` +
+          (formData.subject ? `Subject: ${formData.subject}\n\n` : '\n') +
+          formData.message,
+      });
+      setSubmitted(true);
+      setFormData({ name: '', email: '', subject: '', message: '' });
+      setTimeout(() => setSubmitted(false), 8000);
+    } catch (err: any) {
+      setSubmitError(
+        err?.response?.data?.message ||
+          'Failed to send your message. Please try again or email us directly.'
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -64,6 +87,12 @@ export default function ContactPage() {
             {submitted && (
               <Alert severity="success" sx={{ mb: 3 }}>
                 Thank you for your message! We'll get back to you within 24 hours.
+              </Alert>
+            )}
+
+            {submitError && (
+              <Alert severity="error" sx={{ mb: 3 }} onClose={() => setSubmitError('')}>
+                {submitError}
               </Alert>
             )}
 
@@ -115,8 +144,9 @@ export default function ContactPage() {
                     size="large"
                     startIcon={<Send />}
                     sx={{ px: 4 }}
+                    disabled={submitting}
                   >
-                    Send Message
+                    {submitting ? 'Sending…' : 'Send Message'}
                   </Button>
                 </Grid>
               </Grid>

@@ -32,9 +32,10 @@ import { useRouter } from 'next/navigation';
 import { debounce } from 'lodash';
 import Link from 'next/link';
 import { format } from 'date-fns';
+import { useLazyQuickSearchQuery } from '@/store/api/searchApi';
 
 interface SearchResult {
-  id: number;
+  id: number | string;
   type: 'order' | 'user' | 'payment' | 'review' | 'message';
   title: string;
   subtitle?: string;
@@ -66,52 +67,13 @@ export function GlobalSearch({
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [showResults, setShowResults] = useState(false);
 
-  // Mock search function - in real app this would call your search API
+  // Real role-scoped search against /search/quick/ (orders for everyone,
+  // users for admins)
+  const [triggerQuickSearch] = useLazyQuickSearchQuery();
   const performSearch = async (searchQuery: string): Promise<SearchResult[]> => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 300));
-
     if (!searchQuery.trim()) return [];
-
-    // Mock data - replace with actual API call
-    const allResults: SearchResult[] = [
-      {
-        id: 1,
-        type: 'order',
-        title: `Order #ORD-${Math.floor(Math.random() * 10000)}`,
-        subtitle: 'Research Paper - Psychology',
-        description: 'Academic level: Masters, Pages: 10',
-        url: '/orders/1',
-        status: 'in_progress',
-        createdAt: new Date().toISOString(),
-      },
-      {
-        id: 2,
-        type: 'user',
-        title: 'John Smith',
-        subtitle: 'Student',
-        description: 'john.smith@email.com',
-        url: '/dashboard/admin/users/2',
-        createdAt: new Date().toISOString(),
-      },
-      {
-        id: 3,
-        type: 'payment',
-        title: 'Payment #PAY-001',
-        subtitle: '$150.00',
-        description: 'Order #ORD-1234 - Completed',
-        url: '/payments/3',
-        status: 'completed',
-        createdAt: new Date().toISOString(),
-      },
-    ];
-
-    const mockResults: SearchResult[] = allResults.filter(item =>
-      item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.description?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-
-    return mockResults;
+    const data = await triggerQuickSearch({ query: searchQuery, limit: 8 }).unwrap();
+    return (data ?? []) as SearchResult[];
   };
 
   // Debounced search function

@@ -72,9 +72,14 @@ function PaymentsPage() {
     dateTo: filters.dateTo?.toISOString(),
   };
 
-  const { data: paymentsData, isLoading, error } = isAdmin 
-    ? useGetPaymentsQuery(queryFilters)
-    : useGetUserPaymentsQuery({ page: filters.page, pageSize: filters.pageSize });
+  // Both hooks run unconditionally (Rules of Hooks) — `skip` picks the active
+  // one, so a role resolving after auth hydration can't desync the hook order.
+  const adminQuery = useGetPaymentsQuery(queryFilters, { skip: !isAdmin });
+  const userQuery = useGetUserPaymentsQuery(
+    { page: filters.page, pageSize: filters.pageSize },
+    { skip: isAdmin }
+  );
+  const { data: paymentsData, isLoading, error } = isAdmin ? adminQuery : userQuery;
 
   const [downloadReceipt, { isLoading: downloadingReceipt }] = useDownloadPaymentReceiptMutation();
   const [refundPayment, { isLoading: refunding }] = useRefundPaymentMutation();

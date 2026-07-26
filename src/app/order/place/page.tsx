@@ -129,7 +129,7 @@ function PlaceOrderPage() {
         if (!formData.academicLevel) newErrors.academicLevel = 'Academic level is required';
         if (!formData.description) newErrors.description = 'Description is required';
         if (!formData.instructions) newErrors.instructions = 'Instructions are required';
-        if (formData.budget <= 0) newErrors.budget = 'Budget must be greater than 0';
+        if (formData.budget < 0) newErrors.budget = 'Budget cannot be negative';
         break;
     }
 
@@ -203,35 +203,12 @@ function PlaceOrderPage() {
         return mapping[style] || 'other';
       };
 
-      // Map subject name to ID (simplified mapping - in real app, this would come from an API)
-      const subjectMapping: Record<string, number> = {
-        'Mathematics': 1,
-        'English': 2,
-        'History': 3,
-        'Science': 4,
-        'Computer Science': 5,
-        'Business': 6,
-        'Economics': 7,
-        'Psychology': 8,
-        'Sociology': 9,
-        'Philosophy': 10,
-        'Literature': 11,
-        'Biology': 12,
-        'Chemistry': 13,
-        'Physics': 14,
-        'Engineering': 15,
-        'Medicine': 16,
-        'Law': 17,
-        'Education': 18,
-        'Art': 19,
-        'Music': 20,
-        'Other': 21,
-      };
-
       // Convert form data to API format (using backend field names)
       const orderRequest: CreateOrderRequest = {
         title: formData.title,
-        subject: formData.subject.toLowerCase(), // Use the backend choice value directly
+        // Option values come from the dropdown-options API (already backend
+        // choice values); lowercase only to tolerate the static fallback list.
+        subject: formData.subject.toLowerCase(),
         type: mapOrderType(formData.type),
         level: mapAcademicLevel(formData.academicLevel),
         min_pages: formData.pages,

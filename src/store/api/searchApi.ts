@@ -56,6 +56,8 @@ export const searchApi = baseApi.injectEndpoints({
         const queryString = buildQueryParams(filters);
         return `/search/global/?${queryString}`;
       },
+      transformResponse: (response: any) =>
+        response?.success && response?.data !== undefined ? response.data : response,
       providesTags: ['SearchResults'],
     }),
 
@@ -69,6 +71,11 @@ export const searchApi = baseApi.injectEndpoints({
         const params = { q: query, limit, types: types?.join(',') };
         const queryString = buildQueryParams(params);
         return `/search/quick/?${queryString}`;
+      },
+      transformResponse: (response: any): SearchResult[] => {
+        const payload =
+          response?.success && response?.data !== undefined ? response.data : response;
+        return Array.isArray(payload) ? payload : payload?.results ?? [];
       },
       providesTags: ['SearchResults'],
     }),
@@ -330,6 +337,7 @@ export const searchApi = baseApi.injectEndpoints({
 export const {
   useGlobalSearchQuery,
   useQuickSearchQuery,
+  useLazyQuickSearchQuery,
   useGetSearchSuggestionsQuery,
   useGetRecentSearchesQuery,
   useGetPopularSearchesQuery,

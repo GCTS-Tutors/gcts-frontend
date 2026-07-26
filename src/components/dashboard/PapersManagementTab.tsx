@@ -51,6 +51,7 @@ import {
   FileUpload,
 } from '@mui/icons-material';
 import { RichTextEditor } from '@/components/common/RichTextEditor';
+import { PaperAccessManager } from '@/components/dashboard/PaperAccessManager';
 import { useState } from 'react';
 import { format } from 'date-fns';
 import {
@@ -273,6 +274,9 @@ export function PapersManagementTab() {
 
   return (
     <Box>
+      {/* Access requests + open/excerpt visibility (real /userpapers/ + /papers/ endpoints) */}
+      <PaperAccessManager />
+
       {/* Header with actions */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h5" component="h2">

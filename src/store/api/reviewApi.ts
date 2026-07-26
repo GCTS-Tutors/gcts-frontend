@@ -45,6 +45,7 @@ export interface ReviewFilters {
   rating?: number;
   writerId?: number;
   studentId?: number;
+  status?: 'pending' | 'approved' | 'rejected';
   isPublic?: boolean;
   page?: number;
   pageSize?: number;
@@ -93,20 +94,37 @@ export const reviewApi = baseApi.injectEndpoints({
     
     createReview: builder.mutation<Review, CreateReviewRequest>({
       query: (data) => ({
-        url: `/orders/${data.orderId}/review/`,
+        // Flat /reviews/ resource (the nested /orders/{id}/review/ route the
+        // old code targeted does not exist). Reviews start pending; the admin
+        // approves before they appear publicly.
+        url: '/reviews/',
         method: 'POST',
         body: {
+          order: data.orderId,
           rating: data.rating,
           comment: data.comment,
-          isPublic: data.isPublic ?? true,
         },
       }),
       invalidatesTags: (result, error, { orderId }) => [
         'Review',
         { type: 'Review', id: `ORDER_${orderId}` },
-        { type: 'Review', id: `WRITER_${result?.writer.id}` },
-        { type: 'Review', id: `WRITER_STATS_${result?.writer.id}` },
       ],
+    }),
+
+    approveReview: builder.mutation<Review, string>({
+      query: (id) => ({
+        url: `/reviews/${id}/approve/`,
+        method: 'POST',
+      }),
+      invalidatesTags: ['Review'],
+    }),
+
+    rejectReview: builder.mutation<Review, string>({
+      query: (id) => ({
+        url: `/reviews/${id}/reject/`,
+        method: 'POST',
+      }),
+      invalidatesTags: ['Review'],
     }),
     
     updateReview: builder.mutation<Review, { id: number; data: UpdateReviewRequest }>({
@@ -142,4 +160,6 @@ export const {
   useCreateReviewMutation,
   useUpdateReviewMutation,
   useDeleteReviewMutation,
+  useApproveReviewMutation,
+  useRejectReviewMutation,
 } = reviewApi;

@@ -9,7 +9,8 @@ import {
   Breadcrumbs,
   Paper,
   Divider,
-  CircularProgress
+  CircularProgress,
+  Alert
 } from '@mui/material';
 import {
   Home,
@@ -20,7 +21,8 @@ import {
   Schedule,
   School,
   Download,
-  Share
+  Share,
+  Lock
 } from '@mui/icons-material';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -28,11 +30,31 @@ import { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { papersApi, DetailedPaper } from '@/services/papersApi';
 import PaperDetailsSkeleton from '@/components/PaperDetailsSkeleton';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function PaperDetailsPage() {
   const params = useParams();
+  const { isAuthenticated } = useAuth();
   const [paper, setPaper] = useState<DetailedPaper | null>(null);
   const [loading, setLoading] = useState(true);
+  const [requestingAccess, setRequestingAccess] = useState(false);
+  const [accessError, setAccessError] = useState('');
+
+  const handleRequestAccess = async () => {
+    if (!paper) return;
+    setAccessError('');
+    setRequestingAccess(true);
+    try {
+      const result = await papersApi.requestAccess(paper.slug);
+      setPaper({ ...paper, access_status: result.access_status });
+    } catch (e: any) {
+      setAccessError(
+        e?.response?.data?.detail || e?.response?.data?.message || 'Failed to request access.'
+      );
+    } finally {
+      setRequestingAccess(false);
+    }
+  };
 
   useEffect(() => {
     const fetchPaper = async () => {
@@ -296,6 +318,61 @@ export default function PaperDetailsPage() {
         }}>
           <ReactMarkdown>{paper.content}</ReactMarkdown>
         </Box>
+
+        {/* Access gate — closed papers show only an excerpt until the admin
+            grants this user's access request */}
+        {paper.has_access === false && (
+          <Box sx={{ mt: 3 }}>
+            <Divider sx={{ mb: 3 }} />
+            {accessError && (
+              <Alert severity="error" sx={{ mb: 2 }} onClose={() => setAccessError('')}>
+                {accessError}
+              </Alert>
+            )}
+            {paper.access_status === 'pending' ? (
+              <Alert severity="info" icon={<Lock />}>
+                This is a preview. Your request for full access is pending — you&apos;ll be
+                notified once the admin reviews it.
+              </Alert>
+            ) : paper.access_status === 'rejected' ? (
+              <Alert severity="warning" icon={<Lock />}>
+                This is a preview. Your previous access request was declined — contact us if
+                you believe this is a mistake.
+              </Alert>
+            ) : (
+              <Alert
+                severity="info"
+                icon={<Lock />}
+                action={
+                  isAuthenticated ? (
+                    <Button
+                      color="inherit"
+                      size="small"
+                      variant="outlined"
+                      disabled={requestingAccess}
+                      onClick={handleRequestAccess}
+                    >
+                      {requestingAccess ? 'Requesting…' : 'Request Access'}
+                    </Button>
+                  ) : (
+                    <Button
+                      color="inherit"
+                      size="small"
+                      variant="outlined"
+                      component={Link}
+                      href="/login"
+                    >
+                      Sign in to Request
+                    </Button>
+                  )
+                }
+              >
+                You&apos;re viewing a preview of this paper. Request access from the admin to
+                read the full content.
+              </Alert>
+            )}
+          </Box>
+        )}
       </Paper>
 
       {/* Call to Action */}

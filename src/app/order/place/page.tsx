@@ -51,9 +51,8 @@ export interface OrderFormData {
   // Files
   files: File[];
   
-  // Payment
+  // Payment (informational — payment happens off-site via admin instructions)
   budget: number;
-  paymentMethod: string;
 }
 
 const initialFormData: OrderFormData = {
@@ -70,7 +69,6 @@ const initialFormData: OrderFormData = {
   sources: 0,
   files: [],
   budget: 0,
-  paymentMethod: '',
 };
 
 function PlaceOrderPage() {
@@ -116,9 +114,9 @@ function PlaceOrderPage() {
         // Files are optional, no validation needed
         break;
       
-      case 3: // Payment
-        if (formData.budget <= 0) newErrors.budget = 'Budget must be greater than 0';
-        if (!formData.paymentMethod) newErrors.paymentMethod = 'Payment method is required';
+      case 3: // Payment info (informational — payment happens off-site,
+              // the admin confirms the cost and shares instructions)
+        if (formData.budget < 0) newErrors.budget = 'Budget cannot be negative';
         break;
       
       case 4: // Review (final validation)

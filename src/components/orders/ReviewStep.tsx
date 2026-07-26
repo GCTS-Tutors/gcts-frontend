@@ -274,15 +274,9 @@ export function ReviewStep({ data, errors }: ReviewStepProps) {
                 </Typography>
               </Box>
               
-              <Typography variant="body2" color="text.secondary">
-                <strong>Preferred Payment Method:</strong> {data.paymentMethod ? 
-                  data.paymentMethod.charAt(0).toUpperCase() + data.paymentMethod.slice(1) : 
-                  'Not selected'
-                }
-              </Typography>
-              
               <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-                You'll receive specific payment instructions for this method after order review.
+                No payment is collected now — after review, the final cost and payment
+                instructions will be shared on your order page and by email.
               </Typography>
             </CardContent>
           </Card>

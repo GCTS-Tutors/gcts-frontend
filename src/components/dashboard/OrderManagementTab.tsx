@@ -47,7 +47,8 @@ import {
 import { useState } from 'react';
 import { format, formatDistanceToNow } from 'date-fns';
 import Link from 'next/link';
-import { useGetOrdersQuery, useUpdateOrderMutation, useDeleteOrderMutation } from '@/store/api/orderApi';
+import { useGetOrdersQuery, useUpdateOrderMutation, useDeleteOrderMutation, useAssignOrderMutation } from '@/store/api/orderApi';
+import { useGetWritersQuery } from '@/store/api/userApi';
 
 export function OrderManagementTab() {
   const [page, setPage] = useState(1);
@@ -58,7 +59,10 @@ export function OrderManagementTab() {
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [statusDialog, setStatusDialog] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState(false);
+  const [assignDialog, setAssignDialog] = useState(false);
   const [newStatus, setNewStatus] = useState('');
+  const [selectedWriterId, setSelectedWriterId] = useState<number | ''>('');
+  const [assignError, setAssignError] = useState('');
 
   const { data: ordersResponse, isLoading, error } = useGetOrdersQuery({
     page,
@@ -72,6 +76,8 @@ export function OrderManagementTab() {
 
   const [updateOrder] = useUpdateOrderMutation();
   const [deleteOrder] = useDeleteOrderMutation();
+  const [assignOrder, { isLoading: isAssigning }] = useAssignOrderMutation();
+  const { data: writersData } = useGetWritersQuery({});
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>, order: any) => {
     setAnchorEl(event.currentTarget);
@@ -87,6 +93,26 @@ export function OrderManagementTab() {
     setNewStatus(selectedOrder?.status || '');
     setStatusDialog(true);
     handleMenuClose();
+  };
+
+  const handleAssignClick = () => {
+    setSelectedWriterId(selectedOrder?.assigned_to?.id ?? '');
+    setAssignError('');
+    setAssignDialog(true);
+    handleMenuClose();
+  };
+
+  const handleAssignWriter = async () => {
+    if (!selectedOrder || selectedWriterId === '') return;
+    setAssignError('');
+    try {
+      await assignOrder({ id: selectedOrder.id, writerId: selectedWriterId }).unwrap();
+      setAssignDialog(false);
+      setSelectedOrder(null);
+      setSelectedWriterId('');
+    } catch (e: any) {
+      setAssignError(e?.data?.error || e?.data?.message || 'Failed to assign writer.');
+    }
   };
 
   const handleDeleteClick = () => {
@@ -411,7 +437,7 @@ export function OrderManagementTab() {
           <Edit sx={{ mr: 1, fontSize: 20 }} />
           Update Status
         </MenuItem>
-        <MenuItem onClick={() => handleMenuClose()}>
+        <MenuItem onClick={handleAssignClick}>
           <Assignment sx={{ mr: 1, fontSize: 20 }} />
           Assign Writer
         </MenuItem>
@@ -437,8 +463,10 @@ export function OrderManagementTab() {
                 onChange={(e) => setNewStatus(e.target.value)}
               >
                 <MenuItem value="pending">Pending</MenuItem>
+                <MenuItem value="assigned">Assigned</MenuItem>
                 <MenuItem value="in_progress">In Progress</MenuItem>
-                <MenuItem value="revision">Revision Required</MenuItem>
+                <MenuItem value="solution_submitted">Solution Submitted</MenuItem>
+                <MenuItem value="in_revision">In Revision</MenuItem>
                 <MenuItem value="completed">Completed</MenuItem>
                 <MenuItem value="cancelled">Cancelled</MenuItem>
               </Select>
@@ -449,6 +477,47 @@ export function OrderManagementTab() {
           <Button onClick={() => setStatusDialog(false)}>Cancel</Button>
           <Button onClick={handleUpdateStatus} variant="contained">
             Update Status
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Assign Writer Dialog */}
+      <Dialog open={assignDialog} onClose={() => setAssignDialog(false)} maxWidth="xs" fullWidth>
+        <DialogTitle>Assign Writer</DialogTitle>
+        <DialogContent>
+          <Box sx={{ pt: 1 }}>
+            <Typography variant="body1" gutterBottom>
+              Order: {selectedOrder?.title}
+            </Typography>
+            {assignError && (
+              <Alert severity="error" sx={{ mb: 2 }}>{assignError}</Alert>
+            )}
+            <FormControl fullWidth sx={{ mt: 2 }}>
+              <InputLabel>Writer</InputLabel>
+              <Select
+                value={selectedWriterId}
+                label="Writer"
+                onChange={(e) => setSelectedWriterId(e.target.value as number)}
+              >
+                {(writersData?.results ?? []).map((writer: any) => (
+                  <MenuItem key={writer.id} value={writer.id}>
+                    {writer.firstName || writer.lastName
+                      ? `${writer.firstName ?? ''} ${writer.lastName ?? ''}`.trim()
+                      : writer.email}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setAssignDialog(false)}>Cancel</Button>
+          <Button
+            onClick={handleAssignWriter}
+            variant="contained"
+            disabled={selectedWriterId === '' || isAssigning}
+          >
+            {isAssigning ? 'Assigning…' : 'Assign'}
           </Button>
         </DialogActions>
       </Dialog>

@@ -64,7 +64,8 @@ import { useRouter } from 'next/navigation';
 import { format, formatDistanceToNow } from 'date-fns';
 import { useAuth } from '@/contexts/AuthContext';
 import { PrivateRoute } from '@/components/auth/PrivateRoute';
-import { useGetOrderQuery, useUpdateOrderMutation, useDeleteOrderMutation } from '@/store/api/orderApi';
+import { useGetOrderQuery, useUpdateOrderMutation, useDeleteOrderMutation, useAssignOrderMutation } from '@/store/api/orderApi';
+import { useGetWritersQuery } from '@/store/api/userApi';
 
 interface OrderDetailsPageProps {
   params: {
@@ -78,11 +79,30 @@ function OrderDetailsPage({ params }: OrderDetailsPageProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [statusDialog, setStatusDialog] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState(false);
+  const [assignDialog, setAssignDialog] = useState(false);
   const [newStatus, setNewStatus] = useState('');
+  const [selectedWriterId, setSelectedWriterId] = useState<number | ''>('');
+  const [assignError, setAssignError] = useState('');
 
   const { data: order, isLoading, error, refetch } = useGetOrderQuery(params.id);
   const [updateOrder] = useUpdateOrderMutation();
   const [deleteOrder] = useDeleteOrderMutation();
+  const [assignOrder, { isLoading: isAssigning }] = useAssignOrderMutation();
+  const isAdmin = user?.role === 'admin';
+  const { data: writersData } = useGetWritersQuery({}, { skip: !isAdmin });
+
+  const handleAssignWriter = async () => {
+    if (!order || selectedWriterId === '') return;
+    setAssignError('');
+    try {
+      await assignOrder({ id: order.id, writerId: selectedWriterId }).unwrap();
+      setAssignDialog(false);
+      setSelectedWriterId('');
+      refetch();
+    } catch (e: any) {
+      setAssignError(e?.data?.error || e?.data?.message || 'Failed to assign writer.');
+    }
+  };
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -115,10 +135,13 @@ function OrderDetailsPage({ params }: OrderDetailsPageProps) {
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'completed': return 'success';
+      case 'released': return 'success';
+      case 'assigned': return 'info';
       case 'in_progress': return 'info';
+      case 'solution_submitted': return 'secondary';
       case 'pending': return 'warning';
       case 'cancelled': return 'error';
-      case 'revision': return 'secondary';
+      case 'in_revision': return 'secondary';
       default: return 'default';
     }
   };
@@ -126,10 +149,13 @@ function OrderDetailsPage({ params }: OrderDetailsPageProps) {
   const getStatusIcon = (status: string) => {
     switch (status.toLowerCase()) {
       case 'completed': return <CheckCircle />;
+      case 'released': return <CheckCircle />;
+      case 'assigned': return <Person />;
       case 'in_progress': return <Schedule />;
+      case 'solution_submitted': return <Upload />;
       case 'pending': return <Warning />;
       case 'cancelled': return <Cancel />;
-      case 'revision': return <Refresh />;
+      case 'in_revision': return <Refresh />;
       default: return <Assignment />;
     }
   };
@@ -165,7 +191,8 @@ function OrderDetailsPage({ params }: OrderDetailsPageProps) {
       'Order Placed',
       'Writer Assigned',
       'Work in Progress',
-      'Submitted for Review',
+      'Admin Review',
+      'Solution Released',
       'Completed'
     ];
   };
@@ -173,9 +200,12 @@ function OrderDetailsPage({ params }: OrderDetailsPageProps) {
   const getActiveStep = (status: string) => {
     switch (status.toLowerCase()) {
       case 'pending': return 0;
+      case 'assigned': return 1;
       case 'in_progress': return 2;
-      case 'revision': return 3;
-      case 'completed': return 4;
+      case 'in_revision': return 2;
+      case 'solution_submitted': return 3;
+      case 'released': return 4;
+      case 'completed': return 5;
       case 'cancelled': return -1;
       default: return 0;
     }
@@ -394,6 +424,49 @@ function OrderDetailsPage({ params }: OrderDetailsPageProps) {
 
         {/* Sidebar */}
         <Grid item xs={12} md={4}>
+          {/* Payment — off-site; the admin confirms cost and shares instructions */}
+          {(isAdmin || order.user?.id === user?.id) && (
+            <Card sx={{ mb: 3 }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Payment
+                </Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                  <Typography variant="body2" color="text.secondary">Cost</Typography>
+                  <Typography variant="subtitle1">
+                    {order.price != null ? `$${order.price}` : 'Awaiting confirmation'}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                  <Typography variant="body2" color="text.secondary">Status</Typography>
+                  <Chip
+                    size="small"
+                    label={order.payment_status || 'pending'}
+                    color={order.payment_status === 'paid' ? 'success' : 'warning'}
+                    sx={{ textTransform: 'capitalize' }}
+                  />
+                </Box>
+                {order.payment_instructions ? (
+                  <>
+                    <Typography variant="subtitle2" gutterBottom>
+                      Payment Instructions
+                    </Typography>
+                    <Paper sx={{ p: 2, bgcolor: 'background.default' }}>
+                      <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+                        {order.payment_instructions}
+                      </Typography>
+                    </Paper>
+                  </>
+                ) : (
+                  <Alert severity="info">
+                    Payment is handled off-site. Once the cost is confirmed, payment
+                    instructions will appear here.
+                  </Alert>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
           {/* Student Info */}
           {order.user && (
             <Card sx={{ mb: 3 }}>
@@ -483,13 +556,15 @@ function OrderDetailsPage({ params }: OrderDetailsPageProps) {
                   Writer Assignment
                 </Typography>
                 <Alert severity="info">
-                  No writer assigned yet. The order is available for writers to bid on.
+                  No writer assigned yet. The admin assigns a writer once the order
+                  is confirmed.
                 </Alert>
-                {user?.role === 'admin' && (
+                {isAdmin && (
                   <Button
                     fullWidth
                     variant="contained"
                     sx={{ mt: 2 }}
+                    onClick={() => setAssignDialog(true)}
                   >
                     Assign Writer
                   </Button>
@@ -596,8 +671,10 @@ function OrderDetailsPage({ params }: OrderDetailsPageProps) {
               onChange={(e) => setNewStatus(e.target.value)}
             >
               <MenuItem value="pending">Pending</MenuItem>
+              <MenuItem value="assigned">Assigned</MenuItem>
               <MenuItem value="in_progress">In Progress</MenuItem>
-              <MenuItem value="revision">Revision Required</MenuItem>
+              <MenuItem value="solution_submitted">Solution Submitted</MenuItem>
+              <MenuItem value="in_revision">In Revision</MenuItem>
               <MenuItem value="completed">Completed</MenuItem>
               <MenuItem value="cancelled">Cancelled</MenuItem>
             </Select>
@@ -607,6 +684,45 @@ function OrderDetailsPage({ params }: OrderDetailsPageProps) {
           <Button onClick={() => setStatusDialog(false)}>Cancel</Button>
           <Button onClick={handleStatusUpdate} variant="contained">
             Update Status
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Assign Writer Dialog */}
+      <Dialog open={assignDialog} onClose={() => setAssignDialog(false)} maxWidth="xs" fullWidth>
+        <DialogTitle>Assign Writer</DialogTitle>
+        <DialogContent>
+          {assignError && (
+            <Alert severity="error" sx={{ mb: 2 }}>{assignError}</Alert>
+          )}
+          <FormControl fullWidth sx={{ mt: 2 }}>
+            <InputLabel>Writer</InputLabel>
+            <Select
+              value={selectedWriterId}
+              label="Writer"
+              onChange={(e) => setSelectedWriterId(e.target.value as number)}
+            >
+              {(writersData?.results ?? []).map((writer) => (
+                <MenuItem key={writer.id} value={writer.id}>
+                  {writer.firstName || writer.lastName
+                    ? `${writer.firstName ?? ''} ${writer.lastName ?? ''}`.trim()
+                    : writer.email}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          {writersData && writersData.results?.length === 0 && (
+            <Alert severity="info" sx={{ mt: 2 }}>No writers available.</Alert>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setAssignDialog(false)}>Cancel</Button>
+          <Button
+            onClick={handleAssignWriter}
+            variant="contained"
+            disabled={selectedWriterId === '' || isAssigning}
+          >
+            {isAssigning ? 'Assigning…' : 'Assign'}
           </Button>
         </DialogActions>
       </Dialog>

@@ -141,56 +141,6 @@ export const changePasswordSchema = yup.object({
     .required('Please confirm your new password'),
 });
 
-// Payment validation
-export const paymentSchema = yup.object({
-  amount: yup
-    .number()
-    .min(1, 'Amount must be at least $1')
-    .max(10000, 'Amount must not exceed $10,000')
-    .required('Amount is required'),
-  paymentMethod: yup
-    .string()
-    .oneOf(['credit_card', 'paypal', 'bank_transfer'], 'Please select a valid payment method')
-    .required('Payment method is required'),
-  cardNumber: yup
-    .string()
-    .when('paymentMethod', {
-      is: 'credit_card',
-      then: (schema) => schema
-        .matches(/^\d{4}\s?\d{4}\s?\d{4}\s?\d{4}$/, 'Invalid card number format')
-        .required('Card number is required'),
-      otherwise: (schema) => schema.optional(),
-    }),
-  expiryDate: yup
-    .string()
-    .when('paymentMethod', {
-      is: 'credit_card',
-      then: (schema) => schema
-        .matches(/^(0[1-9]|1[0-2])\/\d{2}$/, 'Invalid expiry date format (MM/YY)')
-        .required('Expiry date is required'),
-      otherwise: (schema) => schema.optional(),
-    }),
-  cvv: yup
-    .string()
-    .when('paymentMethod', {
-      is: 'credit_card',
-      then: (schema) => schema
-        .matches(/^\d{3,4}$/, 'CVV must be 3 or 4 digits')
-        .required('CVV is required'),
-      otherwise: (schema) => schema.optional(),
-    }),
-  billingAddress: yup.object({
-    street: yup.string().required('Street address is required'),
-    city: yup.string().required('City is required'),
-    state: yup.string().required('State is required'),
-    zipCode: yup
-      .string()
-      .matches(/^\d{5}(-\d{4})?$/, 'Invalid ZIP code format')
-      .required('ZIP code is required'),
-    country: yup.string().required('Country is required'),
-  }),
-});
-
 // Review validation
 export const reviewSchema = yup.object({
   rating: yup

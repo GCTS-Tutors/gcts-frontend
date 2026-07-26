@@ -75,13 +75,15 @@ export interface PasswordResetConfirm {
 }
 
 // Order types
-export type OrderStatus = 
-  | 'pending' 
-  | 'assigned' 
-  | 'in_progress' 
-  | 'submitted' 
-  | 'revision_requested' 
-  | 'completed' 
+// Mirrors the backend's canonical Order.ORDER_STATUS vocabulary.
+export type OrderStatus =
+  | 'pending'
+  | 'assigned'
+  | 'in_progress'
+  | 'solution_submitted'
+  | 'released'
+  | 'in_revision'
+  | 'completed'
   | 'cancelled';
 
 export type OrderType = 'essay' | 'research_paper' | 'assignment' | 'thesis' | 'dissertation' | 'other';
@@ -129,6 +131,11 @@ export interface Order {
   total_price?: number; // Backend format
   isPaid?: boolean;
   is_paid?: boolean; // Backend format
+  payment_status?: 'pending' | 'partially paid' | 'paid' | 'refunded'; // Backend format
+  payment_instructions?: string; // Admin-authored; payment happens off-site
+  revisions?: number; // Remaining revision requests (server-enforced cap)
+  solution_released_at?: string | null;
+  solution_link?: string | null;
   createdAt?: string;
   created_at?: string; // Backend format
   updatedAt?: string;

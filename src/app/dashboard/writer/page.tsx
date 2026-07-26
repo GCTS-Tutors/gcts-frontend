@@ -14,7 +14,6 @@ import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { PrivateRoute } from '@/components/auth/PrivateRoute';
 import { WriterOrdersOverview } from '@/components/dashboard/WriterOrdersOverview';
-import { AvailableOrdersList } from '@/components/dashboard/AvailableOrdersList';
 import { StatTile } from '@/components/dashboard/StatTile';
 import { useGetWriterStatsQuery } from '@/store/api/userApi';
 import { useGetMyEarningsQuery } from '@/store/api/paymentApi';
@@ -69,15 +68,6 @@ function WriterDashboard() {
         </CardContent>
       </Card>
 
-      {/* Available orders to pick up */}
-      <Card variant="outlined">
-        <CardContent>
-          <Typography variant="h6" gutterBottom>
-            Available Orders
-          </Typography>
-          <AvailableOrdersList />
-        </CardContent>
-      </Card>
     </Container>
   );
 }

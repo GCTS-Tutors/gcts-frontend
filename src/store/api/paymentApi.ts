@@ -34,18 +34,6 @@ export interface PaymentIntent {
   status: string;
 }
 
-export interface CreatePaymentRequest {
-  orderId: string;
-  paymentMethod: 'card' | 'paypal' | 'bank_transfer';
-  amount: number;
-  currency?: string;
-}
-
-export interface ProcessPaymentRequest {
-  paymentIntentId: string;
-  paymentMethodId?: string;
-}
-
 export interface RefundPaymentRequest {
   amount?: number;
   reason?: string;
@@ -99,22 +87,9 @@ export const paymentApi = baseApi.injectEndpoints({
       providesTags: ['Payment'],
     }),
 
-    createPaymentIntent: builder.mutation<PaymentIntent, CreatePaymentRequest>({
-      query: (data) => ({
-        url: '/payments/create-intent/',
-        method: 'POST',
-        body: data,
-      }),
-    }),
-
-    confirmPayment: builder.mutation<Payment, ProcessPaymentRequest>({
-      query: (data) => ({
-        url: '/payments/confirm/',
-        method: 'POST',
-        body: data,
-      }),
-      invalidatesTags: ['Payment', 'Order'],
-    }),
+    // NOTE: payment happens OFF-SITE per the product workflow — the admin
+    // records cost + instructions on the order. The old create-intent/confirm
+    // gateway mutations were removed along with their backend endpoints.
 
     cancelPayment: builder.mutation<Payment, number>({
       query: (paymentId) => ({
@@ -172,8 +147,7 @@ export const {
   useGetPaymentsQuery,
   useGetPaymentQuery,
   useGetOrderPaymentsQuery,
-  useGetUserPaymentsQuery,  useCreatePaymentIntentMutation,
-  useConfirmPaymentMutation,
+  useGetUserPaymentsQuery,
   useCancelPaymentMutation,
   useRefundPaymentMutation,
   useRetryPaymentMutation,

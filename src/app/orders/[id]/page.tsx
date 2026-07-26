@@ -91,6 +91,47 @@ function OrderDetailsPage({ params }: OrderDetailsPageProps) {
   const isAdmin = user?.role === 'admin';
   const { data: writersData } = useGetWritersQuery({}, { skip: !isAdmin });
 
+  const [paymentDialog, setPaymentDialog] = useState(false);
+  const [paymentForm, setPaymentForm] = useState({
+    price: '' as string | number,
+    payment_status: 'pending',
+    payment_instructions: '',
+  });
+  const [paymentError, setPaymentError] = useState('');
+  const [isSavingPayment, setIsSavingPayment] = useState(false);
+
+  const openPaymentDialog = () => {
+    setPaymentForm({
+      price: order?.price ?? '',
+      payment_status: order?.payment_status ?? 'pending',
+      payment_instructions: order?.payment_instructions ?? '',
+    });
+    setPaymentError('');
+    setPaymentDialog(true);
+  };
+
+  const handleSavePayment = async () => {
+    if (!order) return;
+    setPaymentError('');
+    setIsSavingPayment(true);
+    try {
+      await updateOrder({
+        id: order.id,
+        data: {
+          price: paymentForm.price === '' ? null : Number(paymentForm.price),
+          payment_status: paymentForm.payment_status,
+          payment_instructions: paymentForm.payment_instructions,
+        } as any,
+      }).unwrap();
+      setPaymentDialog(false);
+      refetch();
+    } catch (e: any) {
+      setPaymentError(e?.data?.message || e?.data?.error || 'Failed to save payment details.');
+    } finally {
+      setIsSavingPayment(false);
+    }
+  };
+
   const handleAssignWriter = async () => {
     if (!order || selectedWriterId === '') return;
     setAssignError('');
@@ -463,6 +504,17 @@ function OrderDetailsPage({ params }: OrderDetailsPageProps) {
                     instructions will appear here.
                   </Alert>
                 )}
+                {isAdmin && (
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    startIcon={<Edit />}
+                    onClick={openPaymentDialog}
+                    sx={{ mt: 2 }}
+                  >
+                    Edit Payment Details
+                  </Button>
+                )}
               </CardContent>
             </Card>
           )}
@@ -684,6 +736,55 @@ function OrderDetailsPage({ params }: OrderDetailsPageProps) {
           <Button onClick={() => setStatusDialog(false)}>Cancel</Button>
           <Button onClick={handleStatusUpdate} variant="contained">
             Update Status
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Payment Details Dialog (admin) */}
+      <Dialog open={paymentDialog} onClose={() => setPaymentDialog(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Payment Details</DialogTitle>
+        <DialogContent>
+          {paymentError && (
+            <Alert severity="error" sx={{ mb: 2 }}>{paymentError}</Alert>
+          )}
+          <TextField
+            fullWidth
+            type="number"
+            label="Cost ($)"
+            value={paymentForm.price}
+            onChange={(e) => setPaymentForm((f) => ({ ...f, price: e.target.value }))}
+            sx={{ mt: 2 }}
+            inputProps={{ min: 0 }}
+          />
+          <FormControl fullWidth sx={{ mt: 2 }}>
+            <InputLabel>Payment Status</InputLabel>
+            <Select
+              value={paymentForm.payment_status}
+              label="Payment Status"
+              onChange={(e) => setPaymentForm((f) => ({ ...f, payment_status: e.target.value }))}
+            >
+              <MenuItem value="pending">Pending</MenuItem>
+              <MenuItem value="partially paid">Partially Paid</MenuItem>
+              <MenuItem value="paid">Paid (settled)</MenuItem>
+              <MenuItem value="refunded">Refunded</MenuItem>
+            </Select>
+          </FormControl>
+          <TextField
+            fullWidth
+            multiline
+            minRows={4}
+            label="Payment Instructions"
+            placeholder="e.g. Pay $120 via M-Pesa till 123456 and reply with the confirmation code."
+            value={paymentForm.payment_instructions}
+            onChange={(e) => setPaymentForm((f) => ({ ...f, payment_instructions: e.target.value }))}
+            sx={{ mt: 2 }}
+            helperText="Shown to the student on this order; they are notified when you save changes."
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setPaymentDialog(false)}>Cancel</Button>
+          <Button onClick={handleSavePayment} variant="contained" disabled={isSavingPayment}>
+            {isSavingPayment ? 'Saving…' : 'Save'}
           </Button>
         </DialogActions>
       </Dialog>

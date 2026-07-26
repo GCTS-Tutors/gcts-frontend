@@ -171,12 +171,15 @@ export const orderApi = baseApi.injectEndpoints({
       { orderId: string; file: File; description?: string }
     >({
       query: ({ orderId, file, description }) => {
+        // The backend exposes flat /orderfiles/ (no nested /orders/{id}/files/
+        // route); the order is associated via the multipart body.
         const formData = new FormData();
+        formData.append('order', orderId);
         formData.append('file', file);
         if (description) formData.append('description', description);
-        
+
         return {
-          url: `/orders/${orderId}/files/`,
+          url: '/orderfiles/',
           method: 'POST',
           body: formData,
         };

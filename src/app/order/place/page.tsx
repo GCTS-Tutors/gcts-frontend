@@ -21,7 +21,7 @@ import { RequirementsStep } from '@/components/orders/RequirementsStep';
 import { FilesStep } from '@/components/orders/FilesStep';
 import { PaymentStep } from '@/components/orders/PaymentStep';
 import { ReviewStep } from '@/components/orders/ReviewStep';
-import { useCreateOrderMutation } from '@/store/api/orderApi';
+import { useCreateOrderMutation, useUploadOrderFileMutation } from '@/store/api/orderApi';
 import type { CreateOrderRequest } from '@/types/api';
 
 const steps = [
@@ -79,6 +79,8 @@ function PlaceOrderPage() {
   const router = useRouter();
   const { user } = useAuth();
   const [createOrder, { isLoading, error }] = useCreateOrderMutation();
+  const [uploadOrderFile, { isLoading: isUploading }] = useUploadOrderFileMutation();
+  const [uploadWarning, setUploadWarning] = useState<{ orderId: string; failed: string[] } | null>(null);
 
   const updateFormData = (stepData: Partial<OrderFormData>) => {
     setFormData(prev => ({ ...prev, ...stepData }));
@@ -244,10 +246,22 @@ function PlaceOrderPage() {
       };
 
       const result = await createOrder(orderRequest).unwrap();
-      
-      // TODO: Handle file uploads separately if files exist
-      if (formData.files.length > 0) {
-        // Will implement file upload in next step
+
+      // Upload attachments one by one. The order already exists, so a failed
+      // upload must not lose the order — collect failures and let the user
+      // retry from the order page instead.
+      const failedUploads: string[] = [];
+      for (const file of formData.files) {
+        try {
+          await uploadOrderFile({ orderId: result.id, file }).unwrap();
+        } catch {
+          failedUploads.push(file.name);
+        }
+      }
+
+      if (failedUploads.length > 0) {
+        setUploadWarning({ orderId: result.id, failed: failedUploads });
+        return;
       }
 
       // Redirect to order details page
@@ -329,6 +343,26 @@ function PlaceOrderPage() {
           </Alert>
         )}
 
+        {uploadWarning && (
+          <Alert
+            severity="warning"
+            sx={{ mb: 3 }}
+            action={
+              <Button
+                color="inherit"
+                size="small"
+                onClick={() => router.push(`/orders/${uploadWarning.orderId}`)}
+              >
+                Go to order
+              </Button>
+            }
+          >
+            Your order was created, but {uploadWarning.failed.length} file
+            {uploadWarning.failed.length > 1 ? 's' : ''} failed to upload
+            ({uploadWarning.failed.join(', ')}). You can add them from the order page.
+          </Alert>
+        )}
+
         <Box sx={{ minHeight: 400 }}>
           {renderStepContent(activeStep)}
         </Box>
@@ -347,10 +381,10 @@ function PlaceOrderPage() {
               <Button
                 variant="contained"
                 onClick={handleSubmit}
-                disabled={isLoading}
-                startIcon={isLoading ? <CircularProgress size={20} /> : null}
+                disabled={isLoading || isUploading}
+                startIcon={isLoading || isUploading ? <CircularProgress size={20} /> : null}
               >
-                {isLoading ? 'Creating Order...' : 'Place Order'}
+                {isLoading ? 'Creating Order...' : isUploading ? 'Uploading Files...' : 'Place Order'}
               </Button>
             ) : (
               <Button

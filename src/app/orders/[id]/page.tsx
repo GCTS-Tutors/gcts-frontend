@@ -64,7 +64,15 @@ import { useRouter } from 'next/navigation';
 import { format, formatDistanceToNow } from 'date-fns';
 import { useAuth } from '@/contexts/AuthContext';
 import { PrivateRoute } from '@/components/auth/PrivateRoute';
-import { useGetOrderQuery, useUpdateOrderMutation, useDeleteOrderMutation, useAssignOrderMutation } from '@/store/api/orderApi';
+import {
+  useGetOrderQuery,
+  useUpdateOrderMutation,
+  useDeleteOrderMutation,
+  useAssignOrderMutation,
+  useReleaseSolutionMutation,
+  useRequestRevisionMutation,
+  useUploadOrderFileMutation,
+} from '@/store/api/orderApi';
 import { useGetWritersQuery } from '@/store/api/userApi';
 
 interface OrderDetailsPageProps {
@@ -90,6 +98,57 @@ function OrderDetailsPage({ params }: OrderDetailsPageProps) {
   const [assignOrder, { isLoading: isAssigning }] = useAssignOrderMutation();
   const isAdmin = user?.role === 'admin';
   const { data: writersData } = useGetWritersQuery({}, { skip: !isAdmin });
+
+  const [releaseSolution, { isLoading: isReleasing }] = useReleaseSolutionMutation();
+  const [requestRevision, { isLoading: isRequestingRevision }] = useRequestRevisionMutation();
+  const [uploadOrderFile, { isLoading: isUploadingSolution }] = useUploadOrderFileMutation();
+  const [solutionError, setSolutionError] = useState('');
+  const [revisionDialog, setRevisionDialog] = useState(false);
+  const [revisionReason, setRevisionReason] = useState('');
+  const [revisionError, setRevisionError] = useState('');
+
+  const isOwner = order?.user?.id === user?.id;
+  const solutionFiles = (order?.files ?? []).filter(
+    (f: any) => typeof f === 'object' && f?.fileType === 'solution'
+  );
+  const isReleased = Boolean(order?.solution_released_at);
+
+  const handleUploadSolution = async (fileList: FileList | null) => {
+    if (!order || !fileList?.length) return;
+    setSolutionError('');
+    try {
+      for (const file of Array.from(fileList)) {
+        await uploadOrderFile({ orderId: order.id, file, fileType: 'solution' }).unwrap();
+      }
+      refetch();
+    } catch (e: any) {
+      setSolutionError(e?.data?.message || e?.data?.error || 'Failed to upload solution file.');
+    }
+  };
+
+  const handleRelease = async () => {
+    if (!order) return;
+    setSolutionError('');
+    try {
+      await releaseSolution(order.id).unwrap();
+      refetch();
+    } catch (e: any) {
+      setSolutionError(e?.data?.error || e?.data?.message || 'Failed to release the solution.');
+    }
+  };
+
+  const handleRequestRevision = async () => {
+    if (!order) return;
+    setRevisionError('');
+    try {
+      await requestRevision({ id: order.id, reason: revisionReason }).unwrap();
+      setRevisionDialog(false);
+      setRevisionReason('');
+      refetch();
+    } catch (e: any) {
+      setRevisionError(e?.data?.error || e?.data?.message || 'Failed to request a revision.');
+    }
+  };
 
   const [paymentDialog, setPaymentDialog] = useState(false);
   const [paymentForm, setPaymentForm] = useState({
@@ -465,6 +524,141 @@ function OrderDetailsPage({ params }: OrderDetailsPageProps) {
 
         {/* Sidebar */}
         <Grid item xs={12} md={4}>
+          {/* Solution — admin uploads & releases; owner sees it only after release */}
+          {(isAdmin || isOwner) &&
+            (isAdmin || isReleased || ['solution_submitted', 'in_revision'].includes(order.status)) && (
+            <Card sx={{ mb: 3 }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Solution
+                </Typography>
+                {solutionError && (
+                  <Alert severity="error" sx={{ mb: 2 }}>{solutionError}</Alert>
+                )}
+
+                {isReleased ? (
+                  <>
+                    <Alert severity="success" sx={{ mb: 2 }}>
+                      Solution released
+                      {order.solution_released_at
+                        ? ` ${formatDistanceToNow(new Date(order.solution_released_at), { addSuffix: true })}`
+                        : ''}.
+                    </Alert>
+                    {solutionFiles.length > 0 && (
+                      <List dense>
+                        {solutionFiles.map((f: any) => (
+                          <ListItem
+                            key={f.id}
+                            secondaryAction={
+                              <IconButton edge="end" component="a" href={f.file} target="_blank" rel="noopener">
+                                <GetApp />
+                              </IconButton>
+                            }
+                          >
+                            <ListItemIcon>
+                              <AttachFile />
+                            </ListItemIcon>
+                            <ListItemText primary={f.fileName} />
+                          </ListItem>
+                        ))}
+                      </List>
+                    )}
+                    {order.solution_link && (
+                      <Button
+                        fullWidth
+                        variant="outlined"
+                        startIcon={<GetApp />}
+                        component="a"
+                        href={order.solution_link}
+                        target="_blank"
+                        rel="noopener"
+                        sx={{ mb: 1 }}
+                      >
+                        Open Solution Link
+                      </Button>
+                    )}
+                    {isOwner && (
+                      <Tooltip
+                        title={
+                          (order.revisions ?? 0) > 0
+                            ? ''
+                            : 'This order has used both included revisions.'
+                        }
+                      >
+                        <span>
+                          <Button
+                            fullWidth
+                            variant="outlined"
+                            color="secondary"
+                            startIcon={<Refresh />}
+                            disabled={(order.revisions ?? 0) <= 0}
+                            onClick={() => setRevisionDialog(true)}
+                          >
+                            Request Revision ({order.revisions ?? 0} remaining)
+                          </Button>
+                        </span>
+                      </Tooltip>
+                    )}
+                  </>
+                ) : isAdmin ? (
+                  <>
+                    {solutionFiles.length > 0 ? (
+                      <List dense>
+                        {solutionFiles.map((f: any) => (
+                          <ListItem key={f.id}>
+                            <ListItemIcon>
+                              <AttachFile />
+                            </ListItemIcon>
+                            <ListItemText primary={f.fileName} secondary="Not visible to the student yet" />
+                          </ListItem>
+                        ))}
+                      </List>
+                    ) : (
+                      <Alert severity="info" sx={{ mb: 2 }}>
+                        No solution files uploaded yet.
+                      </Alert>
+                    )}
+                    <Button
+                      fullWidth
+                      variant="outlined"
+                      component="label"
+                      startIcon={<Upload />}
+                      disabled={isUploadingSolution}
+                      sx={{ mb: 1 }}
+                    >
+                      {isUploadingSolution ? 'Uploading…' : 'Upload Solution File'}
+                      <input
+                        type="file"
+                        hidden
+                        multiple
+                        onChange={(e) => {
+                          handleUploadSolution(e.target.files);
+                          e.target.value = '';
+                        }}
+                      />
+                    </Button>
+                    <Button
+                      fullWidth
+                      variant="contained"
+                      color="success"
+                      startIcon={<CheckCircle />}
+                      disabled={isReleasing || (solutionFiles.length === 0 && !order.solution_link)}
+                      onClick={handleRelease}
+                    >
+                      {isReleasing ? 'Releasing…' : 'Release Solution to Student'}
+                    </Button>
+                  </>
+                ) : (
+                  <Alert severity="info">
+                    {order.status === 'in_revision'
+                      ? 'Your revision is in progress — the updated solution will appear here once released.'
+                      : 'Your solution is being reviewed and will appear here once the admin releases it.'}
+                  </Alert>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
           {/* Payment — off-site; the admin confirms cost and shares instructions */}
           {(isAdmin || order.user?.id === user?.id) && (
             <Card sx={{ mb: 3 }}>
@@ -736,6 +930,39 @@ function OrderDetailsPage({ params }: OrderDetailsPageProps) {
           <Button onClick={() => setStatusDialog(false)}>Cancel</Button>
           <Button onClick={handleStatusUpdate} variant="contained">
             Update Status
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Request Revision Dialog (owner) */}
+      <Dialog open={revisionDialog} onClose={() => setRevisionDialog(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Request a Revision</DialogTitle>
+        <DialogContent>
+          {revisionError && (
+            <Alert severity="error" sx={{ mb: 2 }}>{revisionError}</Alert>
+          )}
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Describe what needs to change. You have {order.revisions ?? 0} revision
+            {(order.revisions ?? 0) === 1 ? '' : 's'} remaining on this order; the
+            solution will be re-released after the revision is reviewed.
+          </Typography>
+          <TextField
+            fullWidth
+            multiline
+            minRows={4}
+            label="What should be revised?"
+            value={revisionReason}
+            onChange={(e) => setRevisionReason(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setRevisionDialog(false)}>Cancel</Button>
+          <Button
+            onClick={handleRequestRevision}
+            variant="contained"
+            disabled={isRequestingRevision || !revisionReason.trim()}
+          >
+            {isRequestingRevision ? 'Submitting…' : 'Request Revision'}
           </Button>
         </DialogActions>
       </Dialog>

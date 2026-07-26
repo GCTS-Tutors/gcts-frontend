@@ -168,14 +168,17 @@ export const orderApi = baseApi.injectEndpoints({
 
     uploadOrderFile: builder.mutation<
       OrderFile,
-      { orderId: string; file: File; description?: string }
+      { orderId: string; file: File; description?: string; fileType?: 'requirement' | 'solution' }
     >({
-      query: ({ orderId, file, description }) => {
+      query: ({ orderId, file, description, fileType }) => {
         // The backend exposes flat /orderfiles/ (no nested /orders/{id}/files/
-        // route); the order is associated via the multipart body.
+        // route); the order is associated via the multipart body. fileType
+        // 'solution' is honored only for staff (backend forces 'requirement'
+        // for everyone else).
         const formData = new FormData();
         formData.append('order', orderId);
         formData.append('file', file);
+        if (fileType) formData.append('fileType', fileType);
         if (description) formData.append('description', description);
 
         return {
@@ -302,6 +305,18 @@ export const orderApi = baseApi.injectEndpoints({
       ],
     }),
 
+    releaseSolution: builder.mutation<Order, string>({
+      query: (id) => ({
+        url: `/orders/${id}/release-solution/`,
+        method: 'POST',
+      }),
+      invalidatesTags: (result, error, id) => [
+        { type: 'Order', id },
+        { type: 'Order', id: 'LIST' },
+        'DashboardStats',
+      ],
+    }),
+
     rejectOrder: builder.mutation<Order, { id: string; reason: string }>({
       query: ({ id, reason }) => ({
         url: `/orders/${id}/reject/`,
@@ -315,11 +330,12 @@ export const orderApi = baseApi.injectEndpoints({
       ],
     }),
 
-    requestRevision: builder.mutation<Order, { id: string; feedback: string }>({
-      query: ({ id, feedback }) => ({
+    requestRevision: builder.mutation<Order, { id: string; reason: string }>({
+      query: ({ id, reason }) => ({
         url: `/orders/${id}/request-revision/`,
         method: 'POST',
-        body: { feedback },
+        // Backend reads `reason` (recorded in the order's comment trail)
+        body: { reason },
       }),
       invalidatesTags: (result, error, { id }) => [
         { type: 'Order', id },
@@ -390,6 +406,7 @@ export const {
   useApproveOrderMutation,
   useRejectOrderMutation,
   useRequestRevisionMutation,
+  useReleaseSolutionMutation,
   useGetMyOrderStatsQuery,
   useGetOrderAnalyticsQuery,
 } = orderApi;

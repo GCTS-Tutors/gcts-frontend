@@ -151,9 +151,9 @@ export interface OrderFile {
   file: string;
   fileName: string;
   fileSize: number;
-  uploadedBy: User;
   uploadedAt: string;
-  fileType: 'requirement' | 'submission' | 'revision';
+  // Matches backend OrderFile.kind (serialized as fileType)
+  fileType: 'requirement' | 'solution';
 }
 
 export interface OrderComment {

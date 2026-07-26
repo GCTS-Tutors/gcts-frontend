@@ -171,10 +171,13 @@ function OrdersPage() {
       type: 'multiselect' as const,
       options: [
         { value: 'pending', label: 'Pending' },
+        { value: 'assigned', label: 'Assigned' },
         { value: 'in_progress', label: 'In Progress' },
+        { value: 'solution_submitted', label: 'Under Review' },
+        { value: 'released', label: 'Released' },
+        { value: 'in_revision', label: 'Under Revision' },
         { value: 'completed', label: 'Completed' },
         { value: 'cancelled', label: 'Cancelled' },
-        { value: 'revision', label: 'Under Revision' },
       ],
     },
     {

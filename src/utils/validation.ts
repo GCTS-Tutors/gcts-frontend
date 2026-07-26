@@ -195,7 +195,10 @@ export const userManagementSchema = yup.object({
 export const orderStatusUpdateSchema = yup.object({
   status: yup
     .string()
-    .oneOf(['pending', 'in_progress', 'completed', 'cancelled', 'revision'], 'Please select a valid status')
+    .oneOf(
+      ['pending', 'assigned', 'in_progress', 'solution_submitted', 'released', 'in_revision', 'completed', 'cancelled'],
+      'Please select a valid status'
+    )
     .required('Status is required'),
   notes: yup
     .string()

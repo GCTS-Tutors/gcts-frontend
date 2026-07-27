@@ -241,3 +241,6 @@ Thumbs.db
 
 # Debug logs
 debug.log
+# Production env (real values provisioned on host; keep only the example tracked)
+.env.production
+!deployment/.env.production.example

@@ -116,7 +116,7 @@ pull_code() {
 
     # Pull latest changes
     git fetch origin
-    git pull origin develop
+    git pull origin main
 
     # Get new commit
     NEW_COMMIT=$(git rev-parse HEAD)
@@ -147,6 +147,28 @@ install_dependencies() {
     log "Dependencies installed."
 }
 
+# Provision build-time environment
+#
+# NEXT_PUBLIC_* vars are inlined into the bundle AT BUILD TIME. Without this,
+# `npm run build` falls back to http://localhost:8000 (src/lib/config.ts) and
+# every user's browser calls their own machine. A .env.production file must
+# exist on the host (it is gitignored; copy from .env.production.example).
+provision_env() {
+    log "Provisioning build environment..."
+
+    cd $FRONTEND_DIR
+
+    if [ ! -f .env.production ]; then
+        error ".env.production not found in $FRONTEND_DIR. Copy deployment/.env.production.example and set NEXT_PUBLIC_API_BASE_URL to the real API URL (https, no raw IP)."
+    fi
+
+    if grep -qE '^NEXT_PUBLIC_API_BASE_URL=.*(localhost|127\.0\.0\.1)' .env.production; then
+        error ".env.production still points NEXT_PUBLIC_API_BASE_URL at localhost — set it to the production API URL before deploying."
+    fi
+
+    info "Using $(grep -E '^NEXT_PUBLIC_API_BASE_URL=' .env.production || echo 'NEXT_PUBLIC_API_BASE_URL (unset!)')"
+}
+
 # Build application
 build_application() {
     log "Building Next.js application..."
@@ -156,7 +178,8 @@ build_application() {
     # Set production environment
     export NODE_ENV=production
 
-    # Build the application
+    # Next.js automatically loads .env.production for `next build`
+    # (provisioned/validated in provision_env above).
     npm run build
 
     if [ $? -eq 0 ]; then
@@ -227,6 +250,7 @@ rollback() {
     if [ -n "$PREVIOUS_COMMIT" ]; then
         git checkout $PREVIOUS_COMMIT
         install_dependencies
+        provision_env
         build_application
         restart_service
         health_check
@@ -249,6 +273,7 @@ deploy() {
 
     pull_code
     install_dependencies
+    provision_env
     build_application
     restart_service
     health_check

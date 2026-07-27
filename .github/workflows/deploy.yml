@@ -1,0 +1,38 @@
+name: Deploy Frontend (main)
+
+# Deploy policy: main is the single source of truth (develop is retired).
+#
+# Trigger is manual (workflow_dispatch) by design so a plain code push does not
+# fire a production deploy. To enable auto-deploy on every push to main, add:
+#
+#   push:
+#     branches: [ main ]
+#
+# below `on:` — only after the host has a provisioned .env.production
+# (deployment/.env.production.example) so the build does not inline localhost.
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-frontend
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/ubuntu/gcts/frontend
+            git fetch origin
+            git pull origin main
+            chmod +x deployment/deploy-frontend.sh
+            ./deployment/deploy-frontend.sh deploy
+            pm2 list
+            pm2 logs gcts-frontend --lines 20 --nostream
